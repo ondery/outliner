@@ -1,5 +1,6 @@
 {
   "name": "typescript-outline-enhancer",
+  "author": "Öndery",
   "displayName": "TS OUTLINER",
   "description": "Enhances TypeScript outline with customizable emoji icons for visibility and modifiers",
   "version": "0.0.2",
