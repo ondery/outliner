@@ -143,6 +143,11 @@
           "type": "boolean",
           "default": false,
           "description": "Automatically select the current element in outline when cursor moves in editor"
+        },
+        "tsOutlineEnhancer.autoRevealCurrentElement": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically reveal and focus TreeView when auto-select is active (prevents stealing focus from other panels)"
         }
       }
     }

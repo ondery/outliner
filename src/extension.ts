@@ -43,9 +43,10 @@ class TypeScriptOutlineProvider implements vscode.TreeDataProvider<TreeNode> {
   selectCurrentElement(lineNumber: number): void {
     const config = vscode.workspace.getConfiguration("tsOutlineEnhancer");
     const autoSelect = config.get<boolean>("autoSelectCurrentElement", false);
+    const autoReveal = config.get<boolean>("autoRevealCurrentElement", true);
 
     console.log(
-      `selectCurrentElement called: line=${lineNumber}, autoSelect=${autoSelect}, hasTreeView=${!!this
+      `selectCurrentElement called: line=${lineNumber}, autoSelect=${autoSelect}, autoReveal=${autoReveal}, hasTreeView=${!!this
         .treeView}, isOutlinerClick=${this.isOutlinerClick}`
     );
 
@@ -60,6 +61,14 @@ class TypeScriptOutlineProvider implements vscode.TreeDataProvider<TreeNode> {
       console.log(
         `Auto-select disabled or no tree view: autoSelect=${autoSelect}, treeView=${!!this
           .treeView}`
+      );
+      return;
+    }
+
+    // TreeView kapalıysa ve autoReveal kapalıysa reveal yapma
+    if (!this.treeView!.visible && !autoReveal) {
+      console.log(
+        "TreeView not visible and autoReveal disabled, skipping reveal"
       );
       return;
     }
@@ -80,9 +89,11 @@ class TypeScriptOutlineProvider implements vscode.TreeDataProvider<TreeNode> {
 
       // Eğer TreeView visible değilse, reveal çalışmayabilir
       if (!this.treeView!.visible) {
-        console.log("TreeView not visible, reveal might not work properly");
+        console.log(
+          "TreeView not visible, skipping reveal to prevent focus stealing"
+        );
+        return; // TreeView kapalıysa reveal yapma
       }
-
       try {
         // Center positioning için alternatif yaklaşım
         if (element.type !== "class" && element.type !== "interface") {
