@@ -80,6 +80,8 @@
             "readonly": "📖",
             "abstract": "🎭",
             "async": "⚡",
+            "export": "📤",
+            "default": "🌟",
             "constructor": "🏗️",
             "property": "📝",
             "method": "⚙️",
@@ -193,6 +195,36 @@
                 "🌀",
                 "🔥",
                 "⏰"
+              ]
+            },
+            "export": {
+              "type": "string",
+              "default": "📤",
+              "description": "Emoji for exported members",
+              "examples": [
+                "📤",
+                "📡",
+                "🚀",
+                "📋",
+                "🎯",
+                "🔗",
+                "📢",
+                "🌐"
+              ]
+            },
+            "default": {
+              "type": "string",
+              "default": "🌟",
+              "description": "Emoji for default exports",
+              "examples": [
+                "🌟",
+                "⭐",
+                "🎯",
+                "👑",
+                "💎",
+                "🏆",
+                "🥇",
+                "✨"
               ]
             },
             "constructor": {

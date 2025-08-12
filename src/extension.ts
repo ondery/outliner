@@ -479,6 +479,10 @@ class TypeScriptOutlineProvider implements vscode.TreeDataProvider<TreeNode> {
     );
     if (match) {
       const modifiers: string[] = [];
+      if (match[1]) {
+        // export
+        modifiers.push("export");
+      }
       if (match[2]) {
         // abstract
         modifiers.push("abstract");
@@ -669,28 +673,77 @@ class TypeScriptOutlineProvider implements vscode.TreeDataProvider<TreeNode> {
     line: string,
     lineNumber: number
   ): TreeNode | null {
-    // Function declarations
-    const funcMatch = line.match(/^(export\s+)?(async\s+)?function\s+(\w+)/);
-    if (funcMatch) {
+    // Export default async function (özel durum - önce kontrol et)
+    const exportDefaultAsyncMatch = line.match(
+      /^export\s+default\s+async\s+function\s+(\w+)/
+    );
+    if (exportDefaultAsyncMatch) {
       return {
-        name: funcMatch[3],
+        name: exportDefaultAsyncMatch[1],
         type: "function",
-        visibility: funcMatch[1] ? "public" : "private",
-        modifiers: funcMatch[2] ? ["async"] : [],
+        visibility: "public",
+        modifiers: ["export", "default", "async"],
         line: lineNumber,
       };
     }
 
-    // Arrow functions
+    // Export default function (async olmayan)
+    const exportDefaultMatch = line.match(
+      /^export\s+default\s+function\s+(\w+)/
+    );
+    if (exportDefaultMatch) {
+      return {
+        name: exportDefaultMatch[1],
+        type: "function",
+        visibility: "public",
+        modifiers: ["export", "default"],
+        line: lineNumber,
+      };
+    }
+
+    // Regular function declarations (export ve async kombinasyonları)
+    const funcMatch = line.match(/^(export\s+)?(async\s+)?function\s+(\w+)/);
+    if (funcMatch) {
+      const modifiers: string[] = [];
+      if (funcMatch[2]) modifiers.push("async"); // async modifier
+      if (funcMatch[1]) modifiers.push("export"); // export modifier
+
+      return {
+        name: funcMatch[3],
+        type: "function",
+        visibility: funcMatch[1] ? "public" : "private",
+        modifiers: modifiers,
+        line: lineNumber,
+      };
+    }
+
+    // Arrow functions - const export
     const arrowMatch = line.match(
       /^(export\s+)?const\s+(\w+)\s*=\s*(\([^)]*\)\s*=>|[^=]*=>)/
     );
     if (arrowMatch) {
+      const modifiers: string[] = [];
+      if (arrowMatch[1]) modifiers.push("export"); // export modifier
+
       return {
         name: arrowMatch[2],
         type: "function",
         visibility: arrowMatch[1] ? "public" : "private",
-        modifiers: [],
+        modifiers: modifiers,
+        line: lineNumber,
+      };
+    }
+
+    // Arrow functions - export default (const ile)
+    const exportDefaultArrowMatch = line.match(
+      /^export\s+default\s+(\w+)\s*=\s*(\([^)]*\)\s*=>|[^=]*=>)/
+    );
+    if (exportDefaultArrowMatch) {
+      return {
+        name: exportDefaultArrowMatch[1],
+        type: "function",
+        visibility: "public",
+        modifiers: ["export", "default"],
         line: lineNumber,
       };
     }
@@ -700,10 +753,24 @@ class TypeScriptOutlineProvider implements vscode.TreeDataProvider<TreeNode> {
 
   private extractVisibilityAndModifiers(line: string): {
     visibility: "public" | "private" | "protected";
-    modifiers: ("static" | "readonly" | "abstract" | "async")[];
+    modifiers: (
+      | "static"
+      | "readonly"
+      | "abstract"
+      | "async"
+      | "export"
+      | "default"
+    )[];
   } {
     const trimmed = line.trim();
-    const modifiers: ("static" | "readonly" | "abstract" | "async")[] = [];
+    const modifiers: (
+      | "static"
+      | "readonly"
+      | "abstract"
+      | "async"
+      | "export"
+      | "default"
+    )[] = [];
     let visibility: "public" | "private" | "protected" = "public";
 
     // Visibility tespiti
@@ -716,6 +783,8 @@ class TypeScriptOutlineProvider implements vscode.TreeDataProvider<TreeNode> {
     if (trimmed.includes("readonly ")) modifiers.push("readonly");
     if (trimmed.includes("abstract ")) modifiers.push("abstract");
     if (trimmed.includes("async ")) modifiers.push("async");
+    if (trimmed.includes("export ")) modifiers.push("export");
+    if (trimmed.includes("export default ")) modifiers.push("default");
 
     // Debug için
     console.log(
@@ -738,6 +807,8 @@ class TypeScriptOutlineProvider implements vscode.TreeDataProvider<TreeNode> {
       readonly: "📖",
       abstract: "🎭",
       async: "⚡",
+      export: "📤",
+      default: "🌟",
       constructor: "🏗️",
       property: "📝",
       method: "⚙️",
@@ -804,6 +875,12 @@ class TypeScriptOutlineProvider implements vscode.TreeDataProvider<TreeNode> {
       }
       if (element.modifiers.includes("async")) {
         prefix += emojiSettings.async || "⚡";
+      }
+      if (element.modifiers.includes("export")) {
+        prefix += emojiSettings.export || "📤";
+      }
+      if (element.modifiers.includes("default")) {
+        prefix += emojiSettings.default || "🌟";
       }
     }
 

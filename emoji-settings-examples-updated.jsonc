@@ -1,0 +1,75 @@
+// TypeScript Outline Enhancer - Export/Default Support Added! 📤🌟
+// Copy these settings to your VS Code settings.json
+{
+    // Enable/disable emoji icons in labels
+    "tsOutlineEnhancer.showIconsInLabel": true,
+    // Show visibility text in brackets (optional)
+    "tsOutlineEnhancer.showVisibilityInLabel": false,
+    // Complete Emoji Settings Object (NEW: Export and Default support added!)
+    "tsOutlineEnhancer.emojiSettings": {
+        // Visibility Emojis
+        "public": "🌐", // Global/World (default)
+        "private": "🔒", // Lock (default)
+        "protected": "🛡️", // Shield (default)
+        // Modifier Emojis
+        "static": "📌", // Pin (default)
+        "readonly": "📖", // Book (default)
+        "abstract": "🎭", // Theater Mask (default)
+        "async": "⚡", // Lightning (default)
+        // NEW: Export/Import Emojis ✨
+        "export": "📤", // Export box - for exported functions/classes
+        "default": "🌟", // Star - for default exports
+        // Type Emojis
+        "constructor": "🏗️", // Construction (default)
+        "property": "📝", // Memo (default)
+        "method": "⚙️", // Gear (default)
+        "function": "🔧", // Wrench (default)
+        "getter": "📤", // Outbox tray (default)
+        "setter": "📥", // Inbox tray (default)
+        "class": "📦", // Package (default)
+        "interface": "📋" // Clipboard (default)
+    },
+    // Auto-select settings (optional)
+    "tsOutlineEnhancer.autoSelectCurrentElement": false,
+    "tsOutlineEnhancer.autoRevealCurrentElement": false
+}
+/*
+Alternative Export/Default themed examples:
+
+Professional theme:
+{
+  "tsOutlineEnhancer.emojiSettings": {
+    "public": "🟢",     // Green circle
+    "private": "🔴",    // Red circle
+    "protected": "🟡",  // Yellow circle
+    "export": "📡",     // Satellite antenna
+    "default": "⭐",    // Filled star
+    "function": "🔧",
+    "class": "📦"
+  }
+}
+
+Fun/Creative theme:
+{
+  "tsOutlineEnhancer.emojiSettings": {
+    "export": "🚀",     // Rocket - launches into the world
+    "default": "👑",    // Crown - the main/king export
+    "async": "🌀",      // Cyclone - spinning async operations
+    "static": "🏔️",     // Mountain - unmovable static
+    "private": "🕳️",    // Hole - hidden from outside
+    "public": "🔊"      // Speaker - announced to everyone
+  }
+}
+
+Minimalist theme:
+{
+  "tsOutlineEnhancer.emojiSettings": {
+    "export": "↗️",     // Arrow up-right
+    "default": "⭐",    // Star outline
+    "public": "○",      // Circle outline
+    "private": "●",     // Filled circle
+    "static": "■",      // Square
+    "async": "⟲"       // Refresh symbol
+  }
+}
+*/

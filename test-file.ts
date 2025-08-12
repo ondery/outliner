@@ -103,17 +103,41 @@ export class TestClass extends AbstractBase implements ITestInterface {
   interfaceProperty: string = "interface property";
 }
 
-// Top-level function
+// Top-level functions and exports
+
+// Export function declaration
 export function topLevelFunction(): void {
   console.log("Top level function");
 }
 
-// Top-level async function
+// Export async function declaration
 export async function topLevelAsyncFunction(): Promise<void> {
   console.log("Top level async function");
 }
 
-// Arrow function
+// Export default function
+export function defaultFunction(): void {
+  console.log("Default function");
+}
+
+// Export default async function (React layout örneği)
+export default async function RootLayout(params: any) {
+  const { locale } = await params;
+  console.log("Root layout with locale:", locale);
+  return "HTML content";
+}
+
+// Export arrow function (const)
+export const exportedArrowFunction = (): void => {
+  console.log("Exported arrow function");
+};
+
+// Export async arrow function (const)
+export const exportedAsyncArrowFunction = async (): Promise<void> => {
+  console.log("Exported async arrow function");
+};
+
+// Arrow function (private - not exported)
 const arrowFunction = (): void => {
   console.log("Arrow function");
 };
@@ -121,4 +145,17 @@ const arrowFunction = (): void => {
 // Private top-level function (not exported)
 function privateTopLevelFunction(): void {
   console.log("Private top level function");
+}
+
+// Utility functions export
+export const utilityFunction = (value: string) => {
+  return value.toUpperCase();
+};
+
+// Named export with complex parameters
+export function complexParamFunction(
+  config: { name: string; age: number },
+  callback: (result: string) => void
+): void {
+  callback(`Hello ${config.name}, age: ${config.age}`);
 }
