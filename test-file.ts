@@ -1,4 +1,19 @@
-// Test TypeScript file to demonstrate the outline enhancer
+// Test TypeScript file to demonstrate the TS OUTLINER extension
+//
+// 🎨 EMOJI AYARLARI:
+// settings.json dosyanıza ekleyin:
+// {
+//   "tsOutlineEnhancer.emojiSettings": {
+//     "public": "🟢",
+//     "private": "🔴",
+//     "method": "⚙️",
+//     "class": "📦"
+//   }
+// }
+//
+// Hızlı ayar için:
+// Ctrl+Shift+P -> "TS Outliner: Open Emoji Settings"
+//
 export interface ITestInterface {
   interfaceMethod(): void;
   interfaceProperty: string;

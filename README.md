@@ -50,42 +50,64 @@ Combines multiple emojis for complex elements:
 
 ## 🎨 Complete Customization
 
-### Emoji Settings
+### 🎨 Emoji Settings (UPDATED!)
 
-All 15 emoji types are fully customizable through VS Code settings:
+**Simple object-based emoji configuration** like `editor.quickSuggestions`:
 
 ```json
 {
-  // Type-based emojis
-  "tsOutlineEnhancer.emojis.constructor": "🏗️",
-  "tsOutlineEnhancer.emojis.property": "📝",
-  "tsOutlineEnhancer.emojis.method": "⚙️",
-  "tsOutlineEnhancer.emojis.function": "🔧",
-  "tsOutlineEnhancer.emojis.getter": "📤",
-  "tsOutlineEnhancer.emojis.setter": "📥",
-  "tsOutlineEnhancer.emojis.class": "📦",
-  "tsOutlineEnhancer.emojis.interface": "📋",
-
-  // Visibility emojis
-  "tsOutlineEnhancer.emojis.public": "🌐",
-  "tsOutlineEnhancer.emojis.private": "🔒",
-  "tsOutlineEnhancer.emojis.protected": "🛡️",
-
-  // Modifier emojis
-  "tsOutlineEnhancer.emojis.static": "📌",
-  "tsOutlineEnhancer.emojis.readonly": "📖",
-  "tsOutlineEnhancer.emojis.abstract": "🎭",
-  "tsOutlineEnhancer.emojis.async": "⚡"
+  "tsOutlineEnhancer.emojiSettings": {
+    "public": "🌐",
+    "private": "🔒",
+    "protected": "🛡️",
+    "static": "📌",
+    "readonly": "📖",
+    "abstract": "🎭",
+    "async": "⚡",
+    "constructor": "🏗️",
+    "property": "📝",
+    "method": "⚙️",
+    "function": "🔧",
+    "getter": "📤",
+    "setter": "📥",
+    "class": "📦",
+    "interface": "📋"
+  }
 }
 ```
 
+**Quick setup:**
+
+1. Open Command Palette (`Ctrl+Shift+P`)
+2. Run `TS Outliner: Open Emoji Settings`
+3. VS Code will open settings focused on `emojiSettings`
+
+**Theme examples:**
+
+```json
+// Color-coded theme
+"tsOutlineEnhancer.emojiSettings": {
+  "public": "🟢", "private": "🔴", "protected": "�",
+  "static": "🟦", "readonly": "🟪", "method": "⚙️"
+}
+
+// Minimalist theme
+"tsOutlineEnhancer.emojiSettings": {
+  "public": "●", "private": "○", "protected": "◐",
+  "static": "■", "method": "▶", "class": "▦"
+}
+```
+
+````
+
 ### Behavior Settings
 
-| Setting                                      | Default | Description                                                            |
-| -------------------------------------------- | ------- | ---------------------------------------------------------------------- |
-| `tsOutlineEnhancer.showIconsInLabel`         | `true`  | Show emoji icons in labels                                             |
-| `tsOutlineEnhancer.showVisibilityInLabel`    | `false` | Show visibility text in brackets                                       |
-| `tsOutlineEnhancer.autoSelectCurrentElement` | `false` | **Smart navigation**: Auto-highlight current element when cursor moves |
+| Setting                                      | Default                   | Description                                                            |
+| -------------------------------------------- | ------------------------- | ---------------------------------------------------------------------- |
+| `tsOutlineEnhancer.showIconsInLabel`         | `true`                    | Show emoji icons in labels                                             |
+| `tsOutlineEnhancer.showVisibilityInLabel`    | `false`                   | Show visibility text in brackets                                       |
+| `tsOutlineEnhancer.autoSelectCurrentElement` | `false`                   | **Smart navigation**: Auto-highlight current element when cursor moves |
+| `tsOutlineEnhancer.emojiSettings`            | `{ ... }` (object)        | **Emoji configuration**: Object with emoji properties for all elements |
 
 ## 🚀 Getting Started
 
@@ -106,7 +128,7 @@ All 15 emoji types are fully customizable through VS Code settings:
    {
      "tsOutlineEnhancer.autoSelectCurrentElement": true
    }
-   ```
+````
 
 ## 📱 Interface
 

@@ -1,0 +1,105 @@
+{
+  "// TS Outliner Emoji Settings - Basit Object Formatı": "",
+  "// VS Code settings.json dosyanıza ekleyin": "",
+
+  "tsOutlineEnhancer.emojiSettings": {
+    "public": "🌐",
+    "private": "🔒",
+    "protected": "🛡️",
+    "static": "📌",
+    "readonly": "📖",
+    "abstract": "🎭",
+    "async": "⚡",
+    "constructor": "🏗️",
+    "property": "📝",
+    "method": "⚙️",
+    "function": "🔧",
+    "getter": "📤",
+    "setter": "📥",
+    "class": "📦",
+    "interface": "📋"
+  },
+
+  "// TEMA ÖRNEKLERİ:": "",
+
+  "// Renk Kodlu Tema": {
+    "tsOutlineEnhancer.emojiSettings": {
+      "public": "🟢",
+      "private": "🔴",
+      "protected": "🟡",
+      "static": "🟦",
+      "readonly": "🟪",
+      "async": "💙",
+      "constructor": "🟨",
+      "method": "⚙️",
+      "property": "📊",
+      "class": "📦",
+      "interface": "📄"
+    }
+  },
+
+  "// Profesyonel Tema": {
+    "tsOutlineEnhancer.emojiSettings": {
+      "public": "📢",
+      "private": "🔐",
+      "protected": "🛃",
+      "static": "🎯",
+      "readonly": "👀",
+      "abstract": "💭",
+      "async": "🚀",
+      "constructor": "🔨",
+      "property": "🏷️",
+      "method": "🔧",
+      "function": "💻",
+      "getter": "📡",
+      "setter": "📨",
+      "class": "🏢",
+      "interface": "📜"
+    }
+  },
+
+  "// Minimalist Tema": {
+    "tsOutlineEnhancer.emojiSettings": {
+      "public": "●",
+      "private": "○",
+      "protected": "◐",
+      "static": "■",
+      "readonly": "□",
+      "abstract": "◇",
+      "async": "→",
+      "constructor": "▲",
+      "property": "▪",
+      "method": "▶",
+      "function": "►",
+      "getter": "↗",
+      "setter": "↙",
+      "class": "▦",
+      "interface": "▧"
+    }
+  },
+
+  "// Eğlenceli Tema": {
+    "tsOutlineEnhancer.emojiSettings": {
+      "public": "🌞",
+      "private": "🌚",
+      "protected": "🌙",
+      "static": "⭐",
+      "readonly": "🔮",
+      "abstract": "🎪",
+      "async": "💫",
+      "constructor": "🎪",
+      "property": "🎨",
+      "method": "🎮",
+      "function": "🎯",
+      "getter": "🎁",
+      "setter": "📦",
+      "class": "🏰",
+      "interface": "📜"
+    }
+  },
+
+  "// NASIL KULLANILIR:": "",
+  "// 1. Command Palette açın (Ctrl+Shift+P)": "",
+  "// 2. 'TS Outliner: Open Emoji Settings' çalıştırın": "",
+  "// 3. Ya da manuel olarak settings.json'a yukarıdaki formatı kopyalayın": ""
+}

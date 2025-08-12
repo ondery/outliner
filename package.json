@@ -17,7 +17,8 @@
     "Other"
   ],
   "activationEvents": [
-    "onLanguage:typescript"
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -30,6 +31,11 @@
       {
         "command": "tsOutlineEnhancer.goToLine",
         "title": "Go to Line"
+      },
+      {
+        "command": "tsOutlineEnhancer.openEmojiSettings",
+        "title": "Open Emoji Settings",
+        "category": "TS Outliner"
       }
     ],
     "views": {
@@ -37,7 +43,7 @@
         {
           "id": "tsOutlineEnhancer",
           "name": "TS OUTLINER",
-          "when": "resourceLangId == typescript",
+          "when": "resourceLangId == typescript || resourceLangId == typescriptreact",
           "icon": "$(symbol-class)"
         }
       ]
@@ -64,80 +70,254 @@
           "default": false,
           "description": "Show visibility (public/private/protected) in the label"
         },
-        "tsOutlineEnhancer.emojis.public": {
-          "type": "string",
-          "default": "🌐",
-          "description": "Emoji for public members. Try: 🌐, 🟢, ✅, 📢, 🔓, 🆔, 👥, 📡"
-        },
-        "tsOutlineEnhancer.emojis.private": {
-          "type": "string",
-          "default": "🔒",
-          "description": "Emoji for private members. Try: 🔒, 🔴, ❌, 🚫, 👁️‍🗨️, 🔐, 🕳️, 🖤"
-        },
-        "tsOutlineEnhancer.emojis.protected": {
-          "type": "string",
-          "default": "🛡️",
-          "description": "Emoji for protected members. Try: 🛡️, 🟡, ⚠️, 🔰, 🛃, 🟧, 🔶, 🧡"
-        },
-        "tsOutlineEnhancer.emojis.static": {
-          "type": "string",
-          "default": "📌",
-          "description": "Emoji for static members. Try: 📌, 📍, 🔧, 🏗️, 🎯, 🔩, ⚙️, 🛠️"
-        },
-        "tsOutlineEnhancer.emojis.readonly": {
-          "type": "string",
-          "default": "📖",
-          "description": "Emoji for readonly members. Try: 📖, 👁️, 🔍, 📋, 📄, 👀, 🔎, 📚"
-        },
-        "tsOutlineEnhancer.emojis.abstract": {
-          "type": "string",
-          "default": "🎭",
-          "description": "Emoji for abstract members. Try: 🎭, 💭, 🔮, 👻, 🌟, 💫, 🪄, 🌀"
-        },
-        "tsOutlineEnhancer.emojis.async": {
-          "type": "string",
-          "default": "⚡",
-          "description": "Emoji for async members. Try: ⚡, 🚀, 🔄, ⏳, 💫, 🌀, 🔥, ⏰"
-        },
-        "tsOutlineEnhancer.emojis.constructor": {
-          "type": "string",
-          "default": "🏗️",
-          "description": "Emoji for constructors. Try: 🏗️, 🔨, 🛠️, ⚒️, 🏭, 🔧, ⚙️, 🎯"
-        },
-        "tsOutlineEnhancer.emojis.property": {
-          "type": "string",
-          "default": "📝",
-          "description": "Emoji for properties. Try: 📝, 🏷️, 📄, 📊, 💼, 📂, 🗂️, 📋"
-        },
-        "tsOutlineEnhancer.emojis.method": {
-          "type": "string",
-          "default": "⚙️",
-          "description": "Emoji for methods. Try: ⚙️, 🔧, 🛠️, ⚒️, 🔩, 🎛️, 🕹️, 🎮"
-        },
-        "tsOutlineEnhancer.emojis.function": {
-          "type": "string",
-          "default": "🔧",
-          "description": "Emoji for functions. Try: 🔧, ⚙️, 🛠️, 🎯, 📐, 🧮, 💻, 🖥️"
-        },
-        "tsOutlineEnhancer.emojis.getter": {
-          "type": "string",
-          "default": "📤",
-          "description": "Emoji for getters. Try: 📤, 📡, 🔍, 👁️, 📊, 📈, 🎯, 🔎"
-        },
-        "tsOutlineEnhancer.emojis.setter": {
-          "type": "string",
-          "default": "📥",
-          "description": "Emoji for setters. Try: 📥, 📨, ✏️, ✍️, 📝, 💾, 🖊️, ✒️"
-        },
-        "tsOutlineEnhancer.emojis.class": {
-          "type": "string",
-          "default": "📦",
-          "description": "Emoji for classes. Try: 📦, 🏗️, 🏢, 🏭, 📚, 🎁, 📋, 🗃️"
-        },
-        "tsOutlineEnhancer.emojis.interface": {
-          "type": "string",
-          "default": "📋",
-          "description": "Emoji for interfaces. Try: 📋, 📄, 📜, 📝, 🗒️, 📑, 🧾, 📊"
+        "tsOutlineEnhancer.emojiSettings": {
+          "type": "object",
+          "default": {
+            "public": "🌐",
+            "private": "🔒",
+            "protected": "🛡️",
+            "static": "📌",
+            "readonly": "📖",
+            "abstract": "🎭",
+            "async": "⚡",
+            "constructor": "🏗️",
+            "property": "📝",
+            "method": "⚙️",
+            "function": "🔧",
+            "getter": "📤",
+            "setter": "📥",
+            "class": "📦",
+            "interface": "📋"
+          },
+          "properties": {
+            "public": {
+              "type": "string",
+              "default": "🌐",
+              "description": "Emoji for public members",
+              "examples": [
+                "🌐",
+                "🟢",
+                "✅",
+                "📢",
+                "🔓",
+                "🆔",
+                "👥",
+                "📡"
+              ]
+            },
+            "private": {
+              "type": "string",
+              "default": "🔒",
+              "description": "Emoji for private members",
+              "examples": [
+                "🔒",
+                "🔴",
+                "❌",
+                "🚫",
+                "👁️‍🗨️",
+                "🔐",
+                "🕳️",
+                "🖤"
+              ]
+            },
+            "protected": {
+              "type": "string",
+              "default": "🛡️",
+              "description": "Emoji for protected members",
+              "examples": [
+                "🛡️",
+                "🟡",
+                "⚠️",
+                "🔰",
+                "🛃",
+                "🟧",
+                "🔶",
+                "🧡"
+              ]
+            },
+            "static": {
+              "type": "string",
+              "default": "📌",
+              "description": "Emoji for static members",
+              "examples": [
+                "📌",
+                "📍",
+                "🔧",
+                "🏗️",
+                "🎯",
+                "🔩",
+                "⚙️",
+                "🛠️"
+              ]
+            },
+            "readonly": {
+              "type": "string",
+              "default": "📖",
+              "description": "Emoji for readonly members",
+              "examples": [
+                "📖",
+                "👁️",
+                "🔍",
+                "📋",
+                "📄",
+                "👀",
+                "🔎",
+                "📚"
+              ]
+            },
+            "abstract": {
+              "type": "string",
+              "default": "🎭",
+              "description": "Emoji for abstract members",
+              "examples": [
+                "🎭",
+                "💭",
+                "🔮",
+                "👻",
+                "🌟",
+                "💫",
+                "🪄",
+                "🌀"
+              ]
+            },
+            "async": {
+              "type": "string",
+              "default": "⚡",
+              "description": "Emoji for async members",
+              "examples": [
+                "⚡",
+                "🚀",
+                "🔄",
+                "⏳",
+                "💫",
+                "🌀",
+                "🔥",
+                "⏰"
+              ]
+            },
+            "constructor": {
+              "type": "string",
+              "default": "🏗️",
+              "description": "Emoji for constructors",
+              "examples": [
+                "🏗️",
+                "🔨",
+                "🛠️",
+                "⚒️",
+                "🏭",
+                "🔧",
+                "⚙️",
+                "🎯"
+              ]
+            },
+            "property": {
+              "type": "string",
+              "default": "📝",
+              "description": "Emoji for properties",
+              "examples": [
+                "📝",
+                "🏷️",
+                "📄",
+                "📊",
+                "💼",
+                "📂",
+                "🗂️",
+                "📋"
+              ]
+            },
+            "method": {
+              "type": "string",
+              "default": "⚙️",
+              "description": "Emoji for methods",
+              "examples": [
+                "⚙️",
+                "🔧",
+                "🛠️",
+                "⚒️",
+                "🔩",
+                "🎛️",
+                "🕹️",
+                "🎮"
+              ]
+            },
+            "function": {
+              "type": "string",
+              "default": "🔧",
+              "description": "Emoji for functions",
+              "examples": [
+                "🔧",
+                "⚙️",
+                "🛠️",
+                "🎯",
+                "📐",
+                "🧮",
+                "💻",
+                "🖥️"
+              ]
+            },
+            "getter": {
+              "type": "string",
+              "default": "📤",
+              "description": "Emoji for getters",
+              "examples": [
+                "📤",
+                "📡",
+                "🔍",
+                "👁️",
+                "📊",
+                "📈",
+                "🎯",
+                "🔎"
+              ]
+            },
+            "setter": {
+              "type": "string",
+              "default": "📥",
+              "description": "Emoji for setters",
+              "examples": [
+                "📥",
+                "📨",
+                "✏️",
+                "✍️",
+                "📝",
+                "💾",
+                "🖊️",
+                "✒️"
+              ]
+            },
+            "class": {
+              "type": "string",
+              "default": "📦",
+              "description": "Emoji for classes",
+              "examples": [
+                "📦",
+                "🏗️",
+                "🏢",
+                "🏭",
+                "📚",
+                "🎁",
+                "📋",
+                "🗃️"
+              ]
+            },
+            "interface": {
+              "type": "string",
+              "default": "📋",
+              "description": "Emoji for interfaces",
+              "examples": [
+                "📋",
+                "📄",
+                "📜",
+                "📝",
+                "🗒️",
+                "📑",
+                "🧾",
+                "📊"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "description": "Emoji settings for different TypeScript elements. Configure like editor.quickSuggestions - as an object with emoji properties."
         },
         "tsOutlineEnhancer.autoSelectCurrentElement": {
           "type": "boolean",

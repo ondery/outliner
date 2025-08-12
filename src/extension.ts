@@ -728,62 +728,82 @@ class TypeScriptOutlineProvider implements vscode.TreeDataProvider<TreeNode> {
 
   private getIconPrefix(element: TreeNode): string {
     const config = vscode.workspace.getConfiguration("tsOutlineEnhancer");
+
+    // Emoji ayarlarını object olarak al
+    const emojiSettings = config.get("emojiSettings", {
+      public: "🌐",
+      private: "🔒",
+      protected: "🛡️",
+      static: "📌",
+      readonly: "📖",
+      abstract: "🎭",
+      async: "⚡",
+      constructor: "🏗️",
+      property: "📝",
+      method: "⚙️",
+      function: "🔧",
+      getter: "📤",
+      setter: "📥",
+      class: "📦",
+      interface: "📋",
+    });
+
     let prefix = "";
 
     // Type-based emoji'leri ekle
     switch (element.type) {
       case "constructor":
-        prefix += config.get<string>("emojis.constructor", "🏗️");
+        prefix += emojiSettings.constructor || "🏗️";
         break;
       case "property":
-        prefix += config.get<string>("emojis.property", "📝");
+        prefix += emojiSettings.property || "📝";
         break;
       case "getter":
-        prefix += config.get<string>("emojis.getter", "📤");
+        prefix += emojiSettings.getter || "📤";
         break;
       case "setter":
-        prefix += config.get<string>("emojis.setter", "📥");
+        prefix += emojiSettings.setter || "📥";
         break;
       case "method":
-        prefix += config.get<string>("emojis.method", "⚙️");
+        prefix += emojiSettings.method || "⚙️";
         break;
       case "function":
-        prefix += config.get<string>("emojis.function", "🔧");
+        prefix += emojiSettings.function || "🔧";
         break;
       case "class":
-        prefix += config.get<string>("emojis.class", "📦");
+        prefix += emojiSettings.class || "📦";
         break;
       case "interface":
-        prefix += config.get<string>("emojis.interface", "📋");
+        prefix += emojiSettings.interface || "📋";
         break;
     }
 
-    // Visibility emoji'leri - settings'ten al
+    // Visibility emoji'leri
     switch (element.visibility) {
       case "private":
-        prefix += config.get<string>("emojis.private", "🔒");
+        prefix += emojiSettings.private || "🔒";
         break;
       case "protected":
-        prefix += config.get<string>("emojis.protected", "🛡️");
+        prefix += emojiSettings.protected || "🛡️";
         break;
       case "public":
-        prefix += config.get<string>("emojis.public", "🌐");
+        prefix += emojiSettings.public || "🌐";
         break;
     }
 
-    // Modifier emoji'leri - settings'ten al
+    // Modifier emoji'leri
     if (element.modifiers && element.modifiers.length > 0) {
       if (element.modifiers.includes("static")) {
-        prefix += config.get<string>("emojis.static", "📌");
+        prefix += emojiSettings.static || "📌";
       }
       if (element.modifiers.includes("readonly")) {
-        prefix += config.get<string>("emojis.readonly", "📖");
+        prefix += emojiSettings.readonly || "📖";
       }
       if (element.modifiers.includes("abstract")) {
-        prefix += config.get<string>("emojis.abstract", "🎭");
+        prefix += emojiSettings.abstract || "🎭";
       }
       if (element.modifiers.includes("async")) {
-        prefix += config.get<string>("emojis.async", "⚡");
+        prefix += emojiSettings.async || "⚡";
       }
     }
 
@@ -882,6 +902,22 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // Emoji ayarları komutunu ekle
+  const openEmojiSettingsCommand = vscode.commands.registerCommand(
+    "tsOutlineEnhancer.openEmojiSettings",
+    () => {
+      // Ayarları aç - tsOutlineEnhancer.emojiSettings kısmına odakla
+      vscode.commands.executeCommand(
+        "workbench.action.openSettings",
+        "tsOutlineEnhancer.emojiSettings"
+      );
+      vscode.window.showInformationMessage(
+        "Emoji ayarlarını değiştirmek için tsOutlineEnhancer.emojiSettings seçeneğini düzenleyin.\n" +
+          'Örnek: "public": "🟢", "private": "🔴", "method": "⚙️"'
+      );
+    }
+  );
+
   // Auto refresh
   const onDidChangeTextDocument = vscode.workspace.onDidChangeTextDocument(
     (e) => {
@@ -951,6 +987,7 @@ export function activate(context: vscode.ExtensionContext) {
     treeView,
     refreshCommand,
     goToLineCommand,
+    openEmojiSettingsCommand,
     onDidChangeTextDocument,
     onDidChangeActiveTextEditor,
     onDidChangeTextEditorSelection,
