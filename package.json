@@ -1,0 +1,154 @@
+{
+  "name": "typescript-outline-enhancer",
+  "displayName": "TS OUTLINER",
+  "description": "Enhances TypeScript outline with customizable emoji icons for visibility and modifiers",
+  "version": "0.0.2",
+  "engines": {
+    "vscode": "^1.74.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:typescript"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "typescript-outline-enhancer.refresh",
+        "title": "Refresh TS Outliner",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "tsOutlineEnhancer.goToLine",
+        "title": "Go to Line"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "tsOutlineEnhancer",
+          "name": "TS OUTLINER",
+          "when": "resourceLangId == typescript",
+          "icon": "$(symbol-class)"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "typescript-outline-enhancer.refresh",
+          "when": "view == tsOutlineEnhancer",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "TS OUTLINER",
+      "properties": {
+        "tsOutlineEnhancer.showIconsInLabel": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show emoji icons in labels for visibility and modifiers"
+        },
+        "tsOutlineEnhancer.showVisibilityInLabel": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show visibility (public/private/protected) in the label"
+        },
+        "tsOutlineEnhancer.emojis.public": {
+          "type": "string",
+          "default": "🌐",
+          "description": "Emoji for public members. Try: 🌐, 🟢, ✅, 📢, 🔓, 🆔, 👥, 📡"
+        },
+        "tsOutlineEnhancer.emojis.private": {
+          "type": "string",
+          "default": "🔒",
+          "description": "Emoji for private members. Try: 🔒, 🔴, ❌, 🚫, 👁️‍🗨️, 🔐, 🕳️, 🖤"
+        },
+        "tsOutlineEnhancer.emojis.protected": {
+          "type": "string",
+          "default": "🛡️",
+          "description": "Emoji for protected members. Try: 🛡️, 🟡, ⚠️, 🔰, 🛃, 🟧, 🔶, 🧡"
+        },
+        "tsOutlineEnhancer.emojis.static": {
+          "type": "string",
+          "default": "📌",
+          "description": "Emoji for static members. Try: 📌, 📍, 🔧, 🏗️, 🎯, 🔩, ⚙️, 🛠️"
+        },
+        "tsOutlineEnhancer.emojis.readonly": {
+          "type": "string",
+          "default": "📖",
+          "description": "Emoji for readonly members. Try: 📖, 👁️, 🔍, 📋, 📄, 👀, 🔎, 📚"
+        },
+        "tsOutlineEnhancer.emojis.abstract": {
+          "type": "string",
+          "default": "🎭",
+          "description": "Emoji for abstract members. Try: 🎭, 💭, 🔮, 👻, 🌟, 💫, 🪄, 🌀"
+        },
+        "tsOutlineEnhancer.emojis.async": {
+          "type": "string",
+          "default": "⚡",
+          "description": "Emoji for async members. Try: ⚡, 🚀, 🔄, ⏳, 💫, 🌀, 🔥, ⏰"
+        },
+        "tsOutlineEnhancer.emojis.constructor": {
+          "type": "string",
+          "default": "🏗️",
+          "description": "Emoji for constructors. Try: 🏗️, 🔨, 🛠️, ⚒️, 🏭, 🔧, ⚙️, 🎯"
+        },
+        "tsOutlineEnhancer.emojis.property": {
+          "type": "string",
+          "default": "📝",
+          "description": "Emoji for properties. Try: 📝, 🏷️, 📄, 📊, 💼, 📂, 🗂️, 📋"
+        },
+        "tsOutlineEnhancer.emojis.method": {
+          "type": "string",
+          "default": "⚙️",
+          "description": "Emoji for methods. Try: ⚙️, 🔧, 🛠️, ⚒️, 🔩, 🎛️, 🕹️, 🎮"
+        },
+        "tsOutlineEnhancer.emojis.function": {
+          "type": "string",
+          "default": "🔧",
+          "description": "Emoji for functions. Try: 🔧, ⚙️, 🛠️, 🎯, 📐, 🧮, 💻, 🖥️"
+        },
+        "tsOutlineEnhancer.emojis.getter": {
+          "type": "string",
+          "default": "📤",
+          "description": "Emoji for getters. Try: 📤, 📡, 🔍, 👁️, 📊, 📈, 🎯, 🔎"
+        },
+        "tsOutlineEnhancer.emojis.setter": {
+          "type": "string",
+          "default": "📥",
+          "description": "Emoji for setters. Try: 📥, 📨, ✏️, ✍️, 📝, 💾, 🖊️, ✒️"
+        },
+        "tsOutlineEnhancer.emojis.class": {
+          "type": "string",
+          "default": "📦",
+          "description": "Emoji for classes. Try: 📦, 🏗️, 🏢, 🏭, 📚, 🎁, 📋, 🗃️"
+        },
+        "tsOutlineEnhancer.emojis.interface": {
+          "type": "string",
+          "default": "📋",
+          "description": "Emoji for interfaces. Try: 📋, 📄, 📜, 📝, 🗒️, 📑, 🧾, 📊"
+        },
+        "tsOutlineEnhancer.autoSelectCurrentElement": {
+          "type": "boolean",
+          "default": false,
+          "description": "Automatically select the current element in outline when cursor moves in editor"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.74.0",
+    "@types/node": "16.x",
+    "typescript": "^4.9.4"
+  }
+}
