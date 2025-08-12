@@ -3,7 +3,7 @@
   "author": "Öndery",
   "displayName": "TS OUTLINER",
   "description": "Enhances TypeScript outline with customizable emoji icons for visibility and modifiers",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "MIT",
   "repository": {
     "type": "git",

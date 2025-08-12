@@ -4,6 +4,22 @@ A comprehensive TypeScript outline extension for VS Code that enhances your deve
 
 ## ✨ Key Features
 
+## 🧠 Technical Features
+
+### LSP-Based Analysis
+
+- **Language Server Protocol (LSP)**: Uses VS Code's TypeScript Language Server for accurate symbol detection
+- **AST-Based Parsing**: Leverages Abstract Syntax Tree data instead of regex parsing for better accuracy
+- **Intelligent Fallback**: Automatically falls back to text-based parsing if LSP is unavailable
+- **Real-time Updates**: Seamlessly integrates with TypeScript compiler's semantic analysis
+
+### Enhanced Detection Capabilities
+
+- **Precise Visibility**: Accurately detects public, private, and protected modifiers from TypeScript AST
+- **Advanced Getter/Setter Recognition**: Identifies TypeScript getter/setter patterns both from LSP and source analysis
+- **Static/Async/Abstract Detection**: Comprehensive modifier detection through language server integration
+- **Constructor Special Handling**: Proper TypeScript constructor visibility analysis
+
 ## 🎯 Smart Navigation
 
 - **Auto-sync**: Editor cursor movement automatically highlights the corresponding element in outline
@@ -128,7 +144,7 @@ Combines multiple emojis for complex elements:
    {
      "tsOutlineEnhancer.autoSelectCurrentElement": true
    }
-````
+   ```
 
 ## 📱 Interface
 
@@ -222,6 +238,18 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📋 Changelog
 
+### v0.0.3
+
+- 🚀 **Major Architecture Update**: Replaced regex-based parsing with Language Server Protocol (LSP) integration
+- ✨ Added **AST-Based Analysis** for precise TypeScript symbol detection
+- ✨ Added **Intelligent Fallback System** - automatically switches to text parsing when LSP unavailable
+- ✨ Enhanced **Visibility Detection** - accurate public/private/protected analysis from TypeScript compiler
+- ✨ Improved **Getter/Setter Recognition** with both LSP and source code analysis
+- ✨ Better **Modifier Detection** (static, async, abstract, readonly) through language server
+- 🐛 Fixed **Constructor Visibility** parsing for TypeScript-specific patterns
+- ⚡ **Performance Improvement**: Leverages VS Code's built-in TypeScript analysis
+- 🎯 **Better Accuracy**: Eliminates false positives from regex-based detection
+
 ### v0.0.2
 
 - ✨ Added smart navigation with auto-sync
@@ -234,3 +262,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## 📄 License
 
 MIT © 2025
+````

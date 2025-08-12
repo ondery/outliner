@@ -34,8 +34,8 @@ class TypeScriptOutlineProvider implements vscode.TreeDataProvider<TreeNode> {
     this.treeView = treeView;
   }
 
-  refresh(): void {
-    this.nodes = this.parseTypeScriptFile();
+  async refresh(): Promise<void> {
+    this.nodes = await this.parseTypeScriptFile();
     console.log(`Refreshed outline: Found ${this.nodes.length} nodes`);
     this._onDidChangeTreeData.fire();
   }
@@ -355,13 +355,327 @@ class TypeScriptOutlineProvider implements vscode.TreeDataProvider<TreeNode> {
     return null; // Root level element
   }
 
-  private parseTypeScriptFile(): TreeNode[] {
+  private async parseTypeScriptFile(): Promise<TreeNode[]> {
     const editor = vscode.window.activeTextEditor;
     if (
       !editor ||
       (editor.document.languageId !== "typescript" &&
         editor.document.languageId !== "typescriptreact")
     ) {
+      return [];
+    }
+
+    try {
+      console.log("Attempting to get symbols via LSP...");
+
+      // LSP üzerinden document symbols al
+      const symbols = (await vscode.commands.executeCommand<
+        vscode.DocumentSymbol[]
+      >("vscode.executeDocumentSymbolProvider", editor.document.uri)) as
+        | vscode.DocumentSymbol[]
+        | undefined;
+
+      if (!symbols || symbols.length === 0) {
+        console.log("No symbols found from LSP, falling back to text parsing");
+        return this.fallbackTextParsing();
+      }
+
+      console.log(`Found ${symbols.length} symbols from LSP:`);
+      symbols.forEach((symbol, index) => {
+        console.log(
+          `  ${index + 1}. ${symbol.name} (${
+            vscode.SymbolKind[symbol.kind]
+          }) at line ${symbol.range.start.line}`
+        );
+        if (symbol.children && symbol.children.length > 0) {
+          symbol.children.forEach((child, childIndex) => {
+            console.log(
+              `    ${index + 1}.${childIndex + 1}. ${child.name} (${
+                vscode.SymbolKind[child.kind]
+              }) at line ${child.range.start.line}`
+            );
+          });
+        }
+      });
+
+      const nodes = await this.convertSymbolsToNodes(symbols);
+      console.log(
+        `Successfully converted ${nodes.length} LSP symbols to TreeNodes`
+      );
+      return nodes;
+    } catch (error) {
+      console.error("Error getting symbols from LSP:", error);
+      console.log("Falling back to text parsing due to error");
+      return this.fallbackTextParsing();
+    }
+  }
+
+  private async convertSymbolsToNodes(
+    symbols: vscode.DocumentSymbol[]
+  ): Promise<TreeNode[]> {
+    const nodes = await Promise.all(
+      symbols.map((symbol) => this.convertSymbolToNode(symbol))
+    );
+    return nodes.filter((node): node is TreeNode => node !== null);
+  }
+
+  private async convertSymbolToNode(
+    symbol: vscode.DocumentSymbol
+  ): Promise<TreeNode | null> {
+    const line = symbol.range.start.line;
+    const symbolName = symbol.name;
+
+    // Symbol tipini TreeNode tipine çevir
+    let nodeType = this.mapSymbolKindToNodeType(symbol.kind);
+    if (!nodeType) {
+      return null; // Desteklenmeyen symbol tipi
+    }
+
+    // Eğer method ise, getter/setter olup olmadığını kontrol et
+    if (nodeType === "method") {
+      const detectedType = await this.detectGetterSetterType(symbol);
+      nodeType = detectedType;
+    }
+
+    // Modifiers ve visibility'yi symbol detail'den çıkar
+    const { visibility, modifiers } = await this.extractVisibilityFromSymbol(
+      symbol
+    );
+
+    const node: TreeNode = {
+      name: symbolName,
+      type: nodeType,
+      visibility,
+      modifiers,
+      line,
+      children: symbol.children
+        ? await this.convertSymbolsToNodes(symbol.children)
+        : undefined,
+    };
+
+    console.log(
+      `Converted symbol: ${symbolName} (${symbol.kind}) -> ${nodeType} [${visibility}] at line ${line}`
+    );
+    return node;
+  }
+
+  private mapSymbolKindToNodeType(
+    kind: vscode.SymbolKind
+  ): TreeNode["type"] | null {
+    switch (kind) {
+      case vscode.SymbolKind.Class:
+        return "class";
+      case vscode.SymbolKind.Interface:
+        return "interface";
+      case vscode.SymbolKind.Method:
+        return "method";
+      case vscode.SymbolKind.Property:
+        return "property";
+      case vscode.SymbolKind.Function:
+        return "function";
+      case vscode.SymbolKind.Constructor:
+        return "constructor";
+      // TypeScript-specific getter/setter detection
+      // VS Code LSP bunları genellikle Method olarak raporlar,
+      // isimden getter/setter olup olmadığını anlamamız gerekir
+      default:
+        return null;
+    }
+  }
+
+  // Getter/Setter detection for methods
+  private async detectGetterSetterType(
+    symbol: vscode.DocumentSymbol
+  ): Promise<TreeNode["type"]> {
+    const detail = symbol.detail || "";
+    const name = symbol.name || "";
+
+    // LSP detail'dan getter/setter tespiti
+    if (detail.includes("(get)") || detail.includes("getter")) {
+      return "getter";
+    }
+    if (detail.includes("(set)") || detail.includes("setter")) {
+      return "setter";
+    }
+
+    // Name pattern'dan tespiti
+    if (name.startsWith("get ") || name.startsWith("get_")) {
+      return "getter";
+    }
+    if (name.startsWith("set ") || name.startsWith("set_")) {
+      return "setter";
+    }
+
+    // Kaynak koddan kontrol et
+    const editor = vscode.window.activeTextEditor;
+    if (editor) {
+      try {
+        const line = editor.document.lineAt(symbol.range.start.line);
+        const lineText = line.text.trim();
+
+        // get keyword detection
+        if (
+          lineText.match(
+            /^\s*(public\s+|private\s+|protected\s+|static\s+)*get\s+\w+/
+          )
+        ) {
+          return "getter";
+        }
+
+        // set keyword detection
+        if (
+          lineText.match(
+            /^\s*(public\s+|private\s+|protected\s+|static\s+)*set\s+\w+/
+          )
+        ) {
+          return "setter";
+        }
+      } catch (error) {
+        console.error("Error detecting getter/setter from source:", error);
+      }
+    }
+
+    return "method";
+  }
+
+  private async extractVisibilityFromSymbol(
+    symbol: vscode.DocumentSymbol
+  ): Promise<{
+    visibility: "public" | "private" | "protected";
+    modifiers: string[];
+  }> {
+    const detail = symbol.detail || "";
+    const name = symbol.name || "";
+
+    let visibility: "public" | "private" | "protected" = "public";
+    const modifiers: string[] = [];
+
+    // İlk olarak detail'dan kontrol et
+    if (detail.includes("private")) {
+      visibility = "private";
+    } else if (detail.includes("protected")) {
+      visibility = "protected";
+    } else if (detail.includes("public")) {
+      visibility = "public";
+    } else {
+      // LSP detail'da visibility bilgisi yoksa, kaynak koddan oku
+      const sourceVisibility = await this.getVisibilityFromSource(symbol);
+      if (sourceVisibility.visibility) {
+        visibility = sourceVisibility.visibility;
+      }
+
+      // Source'dan elde edilen modifiers'ları ekle
+      modifiers.push(...sourceVisibility.modifiers);
+    }
+
+    // Modifiers detection from detail
+    if (detail.includes("static")) {
+      modifiers.push("static");
+    }
+    if (detail.includes("readonly")) {
+      modifiers.push("readonly");
+    }
+    if (detail.includes("abstract")) {
+      modifiers.push("abstract");
+    }
+    if (detail.includes("async")) {
+      modifiers.push("async");
+    }
+
+    // Export detection - top-level symbols için
+    if (detail.includes("export") || this.isTopLevelExport(symbol)) {
+      modifiers.push("export");
+    }
+
+    // Constructor özel durumu
+    if (symbol.kind === vscode.SymbolKind.Constructor) {
+      if (detail.includes("private constructor")) {
+        visibility = "private";
+      } else if (detail.includes("protected constructor")) {
+        visibility = "protected";
+      }
+    }
+
+    return { visibility, modifiers };
+  }
+
+  private async getVisibilityFromSource(
+    symbol: vscode.DocumentSymbol
+  ): Promise<{
+    visibility?: "public" | "private" | "protected";
+    modifiers: string[];
+  }> {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+      return { modifiers: [] };
+    }
+
+    try {
+      // Symbol'ün bulunduğu satırı al
+      const line = editor.document.lineAt(symbol.range.start.line);
+      const lineText = line.text.trim();
+
+      console.log(`Analyzing source line: ${lineText}`);
+
+      let visibility: "public" | "private" | "protected" | undefined;
+      const modifiers: string[] = [];
+
+      // Visibility detection
+      if (lineText.includes("private ")) {
+        visibility = "private";
+      } else if (lineText.includes("protected ")) {
+        visibility = "protected";
+      } else if (lineText.includes("public ")) {
+        visibility = "public";
+      }
+
+      // Modifier detection
+      if (lineText.includes("static ")) {
+        modifiers.push("static");
+      }
+      if (lineText.includes("readonly ")) {
+        modifiers.push("readonly");
+      }
+      if (lineText.includes("abstract ")) {
+        modifiers.push("abstract");
+      }
+      if (lineText.includes("async ")) {
+        modifiers.push("async");
+      }
+      if (lineText.includes("export ")) {
+        modifiers.push("export");
+      }
+      if (lineText.includes("export default ")) {
+        modifiers.push("default");
+      }
+
+      return { visibility, modifiers };
+    } catch (error) {
+      console.error("Error reading source for visibility:", error);
+      return { modifiers: [] };
+    }
+  }
+
+  private isTopLevelExport(symbol: vscode.DocumentSymbol): boolean {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+      return false;
+    }
+
+    try {
+      const line = editor.document.lineAt(symbol.range.start.line);
+      return line.text.trim().startsWith("export");
+    } catch {
+      return false;
+    }
+  }
+
+  private fallbackTextParsing(): TreeNode[] {
+    // Eski regex tabanlı parsing'i fallback olarak kullan
+    console.log("Using fallback text parsing");
+
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
       return [];
     }
 
@@ -407,41 +721,9 @@ class TypeScriptOutlineProvider implements vscode.TreeDataProvider<TreeNode> {
 
       // Class içindeki üyeler
       if (currentClass && inClass && braceCount > 0) {
-        // Multi-line method desteği için birden fazla satırı birleştir
-        let fullLine = trimmed;
-        let nextLineIndex = i + 1;
-
-        // Eğer satır açık parantez içeriyorsa ve kapalı parantez yoksa, sonraki satırları da ekle
-        if (
-          fullLine.includes("(") &&
-          !fullLine.includes("){") &&
-          !fullLine.includes("): ") &&
-          !fullLine.includes(");")
-        ) {
-          while (nextLineIndex < lines.length) {
-            const nextLine = lines[nextLineIndex].trim();
-            fullLine += " " + nextLine;
-            nextLineIndex++;
-
-            // Eğer method signature tamamlandıysa dur
-            if (
-              nextLine.includes("){") ||
-              nextLine.includes("): ") ||
-              nextLine.includes(");") ||
-              nextLine.includes("}): ")
-            ) {
-              break;
-            }
-          }
-        }
-
-        const member = this.parseMember(fullLine, i);
+        const member = this.parseMember(trimmed, i);
         if (member) {
           currentClass.children!.push(member);
-          // Eğer multi-line parse yaptıysak, i'yi ilerlet
-          if (nextLineIndex > i + 1) {
-            i = nextLineIndex - 1; // for loop i++'ı halledecek
-          }
           continue;
         }
       }
@@ -953,8 +1235,8 @@ export function activate(context: vscode.ExtensionContext) {
 
   const refreshCommand = vscode.commands.registerCommand(
     "typescript-outline-enhancer.refresh",
-    () => {
-      provider.refresh();
+    async () => {
+      await provider.refresh();
       vscode.window.showInformationMessage("TS Outliner refreshed!");
     }
   );
@@ -1003,7 +1285,7 @@ export function activate(context: vscode.ExtensionContext) {
         (e.document.languageId === "typescript" ||
           e.document.languageId === "typescriptreact")
       ) {
-        setTimeout(() => provider.refresh(), 300);
+        setTimeout(() => provider.refresh().catch(console.error), 300);
       }
     }
   );
@@ -1015,7 +1297,7 @@ export function activate(context: vscode.ExtensionContext) {
         (editor.document.languageId === "typescript" ||
           editor.document.languageId === "typescriptreact")
       ) {
-        provider.refresh();
+        provider.refresh().catch(console.error);
       }
     }
   );
@@ -1048,15 +1330,15 @@ export function activate(context: vscode.ExtensionContext) {
   const onDidChangeConfiguration = vscode.workspace.onDidChangeConfiguration(
     (e) => {
       if (e.affectsConfiguration("tsOutlineEnhancer")) {
-        provider.refresh();
+        provider.refresh().catch(console.error);
         vscode.window.showInformationMessage("TS Outliner settings updated!");
       }
     }
   );
 
   // İlk yükleme - biraz daha gecikme ekle
-  setTimeout(() => {
-    provider.refresh();
+  setTimeout(async () => {
+    await provider.refresh().catch(console.error);
     console.log("Initial refresh completed");
   }, 500);
 
