@@ -29,10 +29,6 @@
         "icon": "$(refresh)"
       },
       {
-        "command": "tsOutlineEnhancer.goToLine",
-        "title": "Go to Line"
-      },
-      {
         "command": "tsOutlineEnhancer.openEmojiSettings",
         "title": "Open Emoji Settings",
         "category": "TS Outliner"
@@ -51,69 +47,26 @@
         "command": "tsOutlineEnhancer.sortByCategory",
         "title": "Sort By: Category",
         "category": "TS Outliner"
-      },
-      {
-        "command": "tsOutlineEnhancer.sortByPositionChecked",
-        "title": "$(check) Sort By: Position",
-        "category": "TS Outliner"
-      },
-      {
-        "command": "tsOutlineEnhancer.sortByNameChecked",
-        "title": "$(check) Sort By: Name",
-        "category": "TS Outliner"
-      },
-      {
-        "command": "tsOutlineEnhancer.sortByCategoryChecked",
-        "title": "$(check) Sort By: Category",
-        "category": "TS Outliner"
       }
     ],
-    "views": {
-      "TS OUTLINER": [
+    "viewsContainers": {
+      "activitybar": [
         {
-          "id": "tsOutlineEnhancer",
-          "name": "TS OUTLINER",
-          "when": "resourceLangId == typescript || resourceLangId == typescriptreact",
+          "id": "ts-outliner",
+          "title": "TS OUTLINER",
           "icon": "$(symbol-class)"
         }
       ]
     },
-    "menus": {
-      "view/title": [
+    "views": {
+      "ts-outliner": [
         {
-          "command": "typescript-outline-enhancer.refresh",
-          "when": "view == tsOutlineEnhancer",
-          "group": "navigation"
-        },
-        {
-          "command": "tsOutlineEnhancer.sortByPosition",
-          "when": "view == tsOutlineEnhancer && !tsOutlineEnhancer.sortMode.position",
-          "group": "1_sort@1"
-        },
-        {
-          "command": "tsOutlineEnhancer.sortByPositionChecked",
-          "when": "view == tsOutlineEnhancer && tsOutlineEnhancer.sortMode.position",
-          "group": "1_sort@1"
-        },
-        {
-          "command": "tsOutlineEnhancer.sortByName",
-          "when": "view == tsOutlineEnhancer && !tsOutlineEnhancer.sortMode.name",
-          "group": "1_sort@2"
-        },
-        {
-          "command": "tsOutlineEnhancer.sortByNameChecked",
-          "when": "view == tsOutlineEnhancer && tsOutlineEnhancer.sortMode.name",
-          "group": "1_sort@2"
-        },
-        {
-          "command": "tsOutlineEnhancer.sortByCategory",
-          "when": "view == tsOutlineEnhancer && !tsOutlineEnhancer.sortMode.category",
-          "group": "1_sort@3"
-        },
-        {
-          "command": "tsOutlineEnhancer.sortByCategoryChecked",
-          "when": "view == tsOutlineEnhancer && tsOutlineEnhancer.sortMode.category",
-          "group": "1_sort@3"
+          "type": "webview",
+          "id": "tsOutlineEnhancer.webview",
+          "name": "TypeScript Enhanced Outline",
+          "when": "resourceLangId == typescript || resourceLangId == typescriptreact",
+          "contextualTitle": "TS OUTLINER",
+          "icon": "$(symbol-class)"
         }
       ]
     },

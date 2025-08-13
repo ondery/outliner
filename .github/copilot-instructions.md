@@ -1,4 +1,4 @@
-# VS Code TypeScript Outline Extension
+# VS Code TS OUTLINER Extension
 
 Bu proje, VS Code'da TypeScript sınıflarının outline görünümünde metod görünürlüğüne (public, private, protected) göre farklı renkler ve ikonlar gösteren bir extension geliştirmek için oluşturulmuştur.
 
