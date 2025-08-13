@@ -3,7 +3,7 @@
   "author": "Öndery",
   "displayName": "TS OUTLINER",
   "description": "Enhances TypeScript outline with customizable emoji icons for visibility and modifiers",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -31,6 +31,21 @@
       {
         "command": "tsOutlineEnhancer.openEmojiSettings",
         "title": "Open Emoji Settings",
+        "category": "TS Outliner"
+      },
+      {
+        "command": "tsOutlineEnhancer.openIconSettings",
+        "title": "Open Icon Settings",
+        "category": "TS Outliner"
+      },
+      {
+        "command": "tsOutlineEnhancer.openFontSettings",
+        "title": "Open Font Settings",
+        "category": "TS Outliner"
+      },
+      {
+        "command": "tsOutlineEnhancer.openIconAppearanceSettings",
+        "title": "Open Icon Appearance Settings",
         "category": "TS Outliner"
       },
       {
@@ -73,10 +88,77 @@
     "configuration": {
       "title": "TS OUTLINER",
       "properties": {
+        "tsOutlineEnhancer.iconType": {
+          "type": "string",
+          "enum": [
+            "emoji",
+            "fontawesome",
+            "none"
+          ],
+          "default": "emoji",
+          "description": "Choose icon type for visibility and modifiers",
+          "enumDescriptions": [
+            "Use emoji icons (🌐, 🔒, etc.)",
+            "Use FontAwesome icons (requires FontAwesome font installed)",
+            "Don't show any icons"
+          ]
+        },
+        "tsOutlineEnhancer.fontFamily": {
+          "type": "string",
+          "default": "Consolas, 'Courier New', monospace",
+          "description": "Font family for the outline view"
+        },
+        "tsOutlineEnhancer.fontSize": {
+          "type": "number",
+          "default": 13,
+          "minimum": 8,
+          "maximum": 30,
+          "description": "Font size for the outline view (in pixels)"
+        },
+        "tsOutlineEnhancer.lineHeight": {
+          "type": "number",
+          "default": 1.2,
+          "minimum": 0.8,
+          "maximum": 3,
+          "description": "Line height multiplier for the outline view"
+        },
+        "tsOutlineEnhancer.iconSize": {
+          "type": "number",
+          "default": 16,
+          "minimum": 8,
+          "maximum": 32,
+          "description": "Icon size in pixels for visibility and modifier icons"
+        },
+        "tsOutlineEnhancer.iconSpacing": {
+          "type": "number",
+          "default": 4,
+          "minimum": 0,
+          "maximum": 20,
+          "description": "Spacing between icons in pixels"
+        },
+        "tsOutlineEnhancer.iconToTextSpacing": {
+          "type": "number",
+          "default": 6,
+          "minimum": 0,
+          "maximum": 20,
+          "description": "Spacing between icons and text in pixels"
+        },
+        "tsOutlineEnhancer.tooltipFontSize": {
+          "type": "number",
+          "default": 11,
+          "minimum": 8,
+          "maximum": 20,
+          "description": "Font size for tooltips in pixels"
+        },
+        "tsOutlineEnhancer.showTooltipPrefixes": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show prefixes in tooltips (e.g., 'Type: Method' vs 'Method')"
+        },
         "tsOutlineEnhancer.showIconsInLabel": {
           "type": "boolean",
           "default": true,
-          "description": "Show emoji icons in labels for visibility and modifiers"
+          "description": "Show icons in labels for visibility and modifiers (depends on iconType setting)"
         },
         "tsOutlineEnhancer.showVisibilityInLabel": {
           "type": "boolean",
@@ -363,6 +445,233 @@
           },
           "additionalProperties": false,
           "description": "Emoji settings for different TypeScript elements. Configure like editor.quickSuggestions - as an object with emoji properties."
+        },
+        "tsOutlineEnhancer.fontAwesomeSettings": {
+          "type": "object",
+          "default": {
+            "public": "fas fa-globe",
+            "private": "fas fa-lock",
+            "protected": "fas fa-shield-alt",
+            "static": "fas fa-thumbtack",
+            "readonly": "fas fa-book-open",
+            "abstract": "fas fa-theater-masks",
+            "async": "fas fa-bolt",
+            "export": "fas fa-share-square",
+            "default": "fas fa-star",
+            "constructor": "fas fa-hammer",
+            "property": "fas fa-tag",
+            "method": "fas fa-cog",
+            "function": "fas fa-wrench",
+            "getter": "fas fa-download",
+            "setter": "fas fa-upload",
+            "class": "fas fa-cube",
+            "interface": "fas fa-clipboard-list"
+          },
+          "properties": {
+            "public": {
+              "type": "string",
+              "default": "fas fa-globe",
+              "description": "FontAwesome class for public members",
+              "examples": [
+                "fas fa-globe",
+                "fas fa-unlock",
+                "far fa-eye",
+                "fas fa-users",
+                "fas fa-broadcast-tower"
+              ]
+            },
+            "private": {
+              "type": "string",
+              "default": "fas fa-lock",
+              "description": "FontAwesome class for private members",
+              "examples": [
+                "fas fa-lock",
+                "fas fa-user-secret",
+                "far fa-eye-slash",
+                "fas fa-key",
+                "fas fa-ban"
+              ]
+            },
+            "protected": {
+              "type": "string",
+              "default": "fas fa-shield-alt",
+              "description": "FontAwesome class for protected members",
+              "examples": [
+                "fas fa-shield-alt",
+                "fas fa-exclamation-triangle",
+                "fas fa-shield-virus",
+                "fas fa-user-shield"
+              ]
+            },
+            "static": {
+              "type": "string",
+              "default": "fas fa-thumbtack",
+              "description": "FontAwesome class for static members",
+              "examples": [
+                "fas fa-thumbtack",
+                "fas fa-anchor",
+                "fas fa-paperclip",
+                "fas fa-map-pin"
+              ]
+            },
+            "readonly": {
+              "type": "string",
+              "default": "fas fa-book-open",
+              "description": "FontAwesome class for readonly members",
+              "examples": [
+                "fas fa-book-open",
+                "far fa-eye",
+                "fas fa-search",
+                "fas fa-glasses",
+                "fas fa-book"
+              ]
+            },
+            "abstract": {
+              "type": "string",
+              "default": "fas fa-theater-masks",
+              "description": "FontAwesome class for abstract members",
+              "examples": [
+                "fas fa-theater-masks",
+                "fas fa-ghost",
+                "fas fa-magic",
+                "fas fa-cloud",
+                "fas fa-puzzle-piece"
+              ]
+            },
+            "async": {
+              "type": "string",
+              "default": "fas fa-bolt",
+              "description": "FontAwesome class for async members",
+              "examples": [
+                "fas fa-bolt",
+                "fas fa-rocket",
+                "fas fa-spinner",
+                "fas fa-clock",
+                "fas fa-sync"
+              ]
+            },
+            "export": {
+              "type": "string",
+              "default": "fas fa-share-square",
+              "description": "FontAwesome class for exported members",
+              "examples": [
+                "fas fa-share-square",
+                "fas fa-external-link-alt",
+                "fas fa-upload",
+                "fas fa-paper-plane"
+              ]
+            },
+            "default": {
+              "type": "string",
+              "default": "fas fa-star",
+              "description": "FontAwesome class for default exports",
+              "examples": [
+                "fas fa-star",
+                "fas fa-crown",
+                "fas fa-gem",
+                "fas fa-trophy",
+                "fas fa-medal"
+              ]
+            },
+            "constructor": {
+              "type": "string",
+              "default": "fas fa-hammer",
+              "description": "FontAwesome class for constructors",
+              "examples": [
+                "fas fa-hammer",
+                "fas fa-tools",
+                "fas fa-wrench",
+                "fas fa-cogs",
+                "fas fa-industry"
+              ]
+            },
+            "property": {
+              "type": "string",
+              "default": "fas fa-tag",
+              "description": "FontAwesome class for properties",
+              "examples": [
+                "fas fa-tag",
+                "fas fa-tags",
+                "fas fa-file-alt",
+                "fas fa-clipboard",
+                "fas fa-sticky-note"
+              ]
+            },
+            "method": {
+              "type": "string",
+              "default": "fas fa-cog",
+              "description": "FontAwesome class for methods",
+              "examples": [
+                "fas fa-cog",
+                "fas fa-cogs",
+                "fas fa-tools",
+                "fas fa-wrench",
+                "fas fa-sliders-h"
+              ]
+            },
+            "function": {
+              "type": "string",
+              "default": "fas fa-wrench",
+              "description": "FontAwesome class for functions",
+              "examples": [
+                "fas fa-wrench",
+                "fas fa-cog",
+                "fas fa-tools",
+                "fas fa-calculator",
+                "fas fa-desktop"
+              ]
+            },
+            "getter": {
+              "type": "string",
+              "default": "fas fa-download",
+              "description": "FontAwesome class for getters",
+              "examples": [
+                "fas fa-download",
+                "fas fa-arrow-down",
+                "far fa-eye",
+                "fas fa-search",
+                "fas fa-chart-line"
+              ]
+            },
+            "setter": {
+              "type": "string",
+              "default": "fas fa-upload",
+              "description": "FontAwesome class for setters",
+              "examples": [
+                "fas fa-upload",
+                "fas fa-arrow-up",
+                "fas fa-edit",
+                "fas fa-pen",
+                "fas fa-save"
+              ]
+            },
+            "class": {
+              "type": "string",
+              "default": "fas fa-cube",
+              "description": "FontAwesome class for classes",
+              "examples": [
+                "fas fa-cube",
+                "fas fa-boxes",
+                "fas fa-building",
+                "fas fa-archive",
+                "fas fa-package"
+              ]
+            },
+            "interface": {
+              "type": "string",
+              "default": "fas fa-clipboard-list",
+              "description": "FontAwesome class for interfaces",
+              "examples": [
+                "fas fa-clipboard-list",
+                "fas fa-list-alt",
+                "fas fa-file-contract",
+                "fas fa-scroll",
+                "fas fa-clipboard"
+              ]
+            }
+          },
+          "additionalProperties": false,
+          "description": "FontAwesome icon settings for different TypeScript elements. Use FontAwesome class names like 'fas fa-globe', 'far fa-eye', etc."
         },
         "tsOutlineEnhancer.autoSelectCurrentElement": {
           "type": "boolean",

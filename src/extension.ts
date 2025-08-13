@@ -1,143 +1,144 @@
-// The module 'vscode' contains the VS Code extensibility API
 import * as vscode from "vscode";
+import { TypeScriptParser } from "./typescript-parser";
 import { TypeScriptWebviewProvider } from "./webview-provider";
+import { OutlineSorter } from "./outline-sorter";
 
 export function activate(context: vscode.ExtensionContext) {
-  console.log("TS OUTLINER is now active!");
+  console.log("TypeScript Outliner Extension is now active!");
 
-  // Webview provider oluştur
-  const provider = new TypeScriptWebviewProvider(context.extensionUri);
+  // TypeScript parser'ı oluştur
+  const parser = new TypeScriptParser();
 
-  // Webview view'ını kaydet
-  context.subscriptions.push(
-    vscode.window.registerWebviewViewProvider(
-      TypeScriptWebviewProvider.viewType,
-      provider
-    )
+  // Webview provider'ı kaydet
+  const webviewProvider = new TypeScriptWebviewProvider(context.extensionUri);
+  const webviewDisposable = vscode.window.registerWebviewViewProvider(
+    TypeScriptWebviewProvider.viewType,
+    webviewProvider
   );
 
-  // Refresh command
+  // Komutları kaydet
   const refreshCommand = vscode.commands.registerCommand(
-    "typescript-outline-enhancer.refresh",
-    async () => {
-      await provider.refresh();
-      vscode.window.showInformationMessage("TS Outliner refreshed!");
+    "typescriptOutliner.refresh",
+    () => {
+      webviewProvider.refresh();
+      vscode.window.showInformationMessage("TypeScript Outline refreshed!");
     }
   );
 
-  // Emoji ayarları komutu
-  const openEmojiSettingsCommand = vscode.commands.registerCommand(
-    "tsOutlineEnhancer.openEmojiSettings",
+  const sortByVisibilityCommand = vscode.commands.registerCommand(
+    "typescriptOutliner.sortByVisibility",
+    () => {
+      webviewProvider.setSortMode("category");
+      vscode.window.showInformationMessage("Outline sorted by visibility!");
+    }
+  );
+
+  const sortAlphabeticallyCommand = vscode.commands.registerCommand(
+    "typescriptOutliner.sortAlphabetically",
+    () => {
+      webviewProvider.setSortMode("name");
+      vscode.window.showInformationMessage("Outline sorted alphabetically!");
+    }
+  );
+
+  // Font ayarları komutunu kaydet
+  const openFontSettingsCommand = vscode.commands.registerCommand(
+    "typescriptOutliner.openFontSettings",
     () => {
       vscode.commands.executeCommand(
         "workbench.action.openSettings",
-        "tsOutlineEnhancer.emojiSettings"
+        "@ext:undefined_publisher.typescript-outliner font"
       );
+    }
+  );
+
+  // İkon görünüm ayarları komutunu kaydet
+  const openIconAppearanceSettingsCommand = vscode.commands.registerCommand(
+    "typescriptOutliner.openIconAppearanceSettings",
+    () => {
+      vscode.commands.executeCommand(
+        "workbench.action.openSettings",
+        "@ext:undefined_publisher.typescript-outliner icon"
+      );
+    }
+  );
+
+  // Tüm ayarlar komutunu kaydet
+  const openAllSettingsCommand = vscode.commands.registerCommand(
+    "typescriptOutliner.openAllSettings",
+    () => {
+      vscode.commands.executeCommand(
+        "workbench.action.openSettings",
+        "@ext:undefined_publisher.typescript-outliner"
+      );
+    }
+  );
+
+  // Test komutunu kaydet
+  const testCommand = vscode.commands.registerCommand(
+    "typescriptOutliner.test",
+    () => {
+      const config = vscode.workspace.getConfiguration("typescriptOutliner");
+      const iconType = config.get<string>("iconType", "emoji");
+      const fontFamily = config.get<string>("fontFamily", "inherit");
+      const fontSize = config.get<number>("fontSize", 14);
+
       vscode.window.showInformationMessage(
-        "Emoji ayarlarını değiştirmek için tsOutlineEnhancer.emojiSettings seçeneğini düzenleyin.\n" +
-          'Örnek: "public": "🟢", "private": "🔴", "method": "⚙️"'
+        `TS Outliner - Icon: ${iconType}, Font: ${fontFamily}, Size: ${fontSize}px`
       );
     }
   );
 
-  // Sıralama komutları
-  const sortByPositionCommand = vscode.commands.registerCommand(
-    "tsOutlineEnhancer.sortByPosition",
-    () => {
-      provider.setSortMode("position");
-      vscode.window.showInformationMessage("Sorted by position");
-    }
-  );
-
-  const sortByNameCommand = vscode.commands.registerCommand(
-    "tsOutlineEnhancer.sortByName",
-    () => {
-      provider.setSortMode("name");
-      vscode.window.showInformationMessage("Sorted by name");
-    }
-  );
-
-  const sortByCategoryCommand = vscode.commands.registerCommand(
-    "tsOutlineEnhancer.sortByCategory",
-    () => {
-      provider.setSortMode("category");
-      vscode.window.showInformationMessage("Sorted by category");
-    }
-  );
-
-  // Auto refresh - dosya değiştiğinde
-  const onDidChangeTextDocument = vscode.workspace.onDidChangeTextDocument(
-    (e) => {
-      if (
-        e.document === vscode.window.activeTextEditor?.document &&
-        (e.document.languageId === "typescript" ||
-          e.document.languageId === "typescriptreact")
-      ) {
-        setTimeout(() => provider.refresh().catch(console.error), 300);
+  // Configuration değişikliklerini dinle
+  const configChangeDisposable = vscode.workspace.onDidChangeConfiguration(
+    (event) => {
+      if (event.affectsConfiguration("typescriptOutliner")) {
+        console.log("TypeScript Outliner configuration changed");
+        webviewProvider.refresh();
       }
     }
   );
 
-  // Auto refresh - aktif editor değiştiğinde
-  const onDidChangeActiveTextEditor = vscode.window.onDidChangeActiveTextEditor(
-    (editor) => {
-      if (
-        editor &&
-        (editor.document.languageId === "typescript" ||
-          editor.document.languageId === "typescriptreact")
-      ) {
-        provider.refresh().catch(console.error);
-      }
-    }
-  );
-
-  // Cursor pozisyonu değiştiğinde auto-select
-  const onDidChangeTextEditorSelection =
-    vscode.window.onDidChangeTextEditorSelection((e) => {
-      const config = vscode.workspace.getConfiguration("tsOutlineEnhancer");
-      const autoSelectCurrentElement = config.get(
-        "autoSelectCurrentElement",
-        false
-      );
-
-      if (
-        autoSelectCurrentElement &&
-        e.textEditor === vscode.window.activeTextEditor &&
-        (e.textEditor.document.languageId === "typescript" ||
-          e.textEditor.document.languageId === "typescriptreact")
-      ) {
-        const cursorLine = e.selections[0].active.line;
-        provider.selectElementAtLine(cursorLine);
-      }
+  // Aktif editörün değişmesini dinle
+  const activeEditorChangeDisposable =
+    vscode.window.onDidChangeActiveTextEditor(() => {
+      webviewProvider.refresh();
     });
 
-  // Ayarlar değiştiğinde yenile
-  const onDidChangeConfiguration = vscode.workspace.onDidChangeConfiguration(
-    (e) => {
-      if (e.affectsConfiguration("tsOutlineEnhancer")) {
-        provider.refresh().catch(console.error);
-        vscode.window.showInformationMessage("TS Outliner settings updated!");
+  // Text document değişikliklerini dinle
+  const documentChangeDisposable = vscode.workspace.onDidChangeTextDocument(
+    (event) => {
+      const activeEditor = vscode.window.activeTextEditor;
+      if (activeEditor && event.document === activeEditor.document) {
+        // Debounced refresh için setTimeout kullan
+        setTimeout(() => {
+          webviewProvider.refresh();
+        }, 500);
       }
     }
   );
 
-  // İlk yükleme
-  setTimeout(async () => {
-    await provider.refresh().catch(console.error);
-    console.log("Initial refresh completed");
-  }, 500);
-
+  // Disposable'ları context'e ekle
   context.subscriptions.push(
+    webviewDisposable,
     refreshCommand,
-    openEmojiSettingsCommand,
-    sortByPositionCommand,
-    sortByNameCommand,
-    sortByCategoryCommand,
-    onDidChangeTextDocument,
-    onDidChangeActiveTextEditor,
-    onDidChangeTextEditorSelection,
-    onDidChangeConfiguration
+    sortByVisibilityCommand,
+    sortAlphabeticallyCommand,
+    openFontSettingsCommand,
+    openIconAppearanceSettingsCommand,
+    openAllSettingsCommand,
+    testCommand,
+    configChangeDisposable,
+    activeEditorChangeDisposable,
+    documentChangeDisposable
+  );
+
+  // Extension aktif olduğunu göster
+  vscode.window.showInformationMessage(
+    "TypeScript Outliner Extension loaded successfully!"
   );
 }
 
-export function deactivate() {}
+export function deactivate() {
+  console.log("TypeScript Outliner Extension deactivated");
+}

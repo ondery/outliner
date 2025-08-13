@@ -113,6 +113,19 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
       // Settings'den tüm ayarları al
       const config = vscode.workspace.getConfiguration("tsOutlineEnhancer");
       const emojiSettings = config.get("emojiSettings", {});
+      const fontAwesomeSettings = config.get("fontAwesomeSettings", {});
+      const iconType = config.get("iconType", "emoji");
+      const fontFamily = config.get(
+        "fontFamily",
+        "Consolas, 'Courier New', monospace"
+      );
+      const fontSize = config.get("fontSize", 13);
+      const lineHeight = config.get("lineHeight", 1.2);
+      const iconSize = config.get("iconSize", 16);
+      const iconSpacing = config.get("iconSpacing", 4);
+      const iconToTextSpacing = config.get("iconToTextSpacing", 6);
+      const tooltipFontSize = config.get("tooltipFontSize", 11);
+      const showTooltipPrefixes = config.get("showTooltipPrefixes", false);
       const showIconsInLabel = config.get("showIconsInLabel", true);
       const showVisibilityInLabel = config.get("showVisibilityInLabel", false);
       const autoSelectCurrentElement = config.get(
@@ -137,6 +150,16 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
         sortMode: this.sortMode,
         settings: {
           emojiSettings,
+          fontAwesomeSettings,
+          iconType,
+          fontFamily,
+          fontSize,
+          lineHeight,
+          iconSize,
+          iconSpacing,
+          iconToTextSpacing,
+          tooltipFontSize,
+          showTooltipPrefixes,
           showIconsInLabel,
           showVisibilityInLabel,
           autoSelectCurrentElement,

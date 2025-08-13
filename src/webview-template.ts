@@ -14,6 +14,8 @@ export class WebViewTemplateManager {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TS Outliner</title>
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous">
     <style>
         ${this.getStyles()}
     </style>
@@ -61,6 +63,39 @@ export class WebViewTemplateManager {
             overflow: hidden;
         }
 
+        /* Custom font family and sizing - will be updated via JavaScript */
+        .outline-container {
+            font-family: var(--outline-font-family, var(--vscode-font-family));
+            font-size: var(--outline-font-size, var(--vscode-font-size));
+            line-height: var(--outline-line-height, 1.2);
+        }
+
+        /* Icon sizing and spacing variables */
+        :root {
+            --icon-size: 16px;
+            --icon-spacing: 4px;
+            --icon-to-text-spacing: 6px;
+            --tooltip-font-size: 11px;
+        }
+
+        /* Override specific element font sizes to use relative units */
+        .node-name {
+            flex: 1;
+            font-size: 1em; /* Use relative to parent font size */
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .line-number {
+            font-size: 0.8em; /* Relative to parent font size */
+            color: var(--vscode-descriptionForeground);
+            opacity: 0.7;
+            margin-left: auto;
+        }
+
+
+
         /* Layout Components */
         .sidebar {
             display: flex;
@@ -89,7 +124,7 @@ export class WebViewTemplateManager {
         }
 
         .section-header {
-            font-size: 0.7rem;
+            font-size: 0.8em; /* Relative to container font size */
             font-weight: 600;
             color: var(--vscode-descriptionForeground);
             text-transform: uppercase;
@@ -107,7 +142,7 @@ export class WebViewTemplateManager {
             background: var(--vscode-button-background);
             color: var(--vscode-button-foreground);
             cursor: pointer;
-            font-size: 0.7rem;
+            font-size: 0.8em; /* Relative to container font size */
             display: flex;
             align-items: center;
             gap: var(--spacing-xs);
@@ -138,7 +173,7 @@ export class WebViewTemplateManager {
             cursor: pointer;
             transition: var(--transition);
             min-height: 1.5rem;
-            gap: var(--spacing-xs);
+            gap: var(--icon-to-text-spacing); /* Spacing between icons and text */
             user-select: none;
         }
 
@@ -172,7 +207,7 @@ export class WebViewTemplateManager {
             justify-content: center;
             cursor: pointer;
             transition: transform 0.2s ease-in-out;
-            font-size: 0.6rem;
+            font-size: 0.8em; /* Relative to parent font size */
         }
 
         .chevron.expanded {
@@ -185,37 +220,45 @@ export class WebViewTemplateManager {
         }
 
         .type-icon {
-            font-size: 0.8rem;
+            font-size: var(--icon-size); /* Use icon size setting */
             display: flex;
             align-items: center;
+            width: var(--icon-size);
+            height: var(--icon-size);
+        }
+
+        /* FontAwesome icon styling */
+        .fa-icon {
+            font-size: var(--icon-size); /* Use icon size setting */
+            display: flex;
+            align-items: center;
+            width: var(--icon-size);
+            height: var(--icon-size);
+            justify-content: center;
+        }
+
+        .feature-icon {
+            font-size: calc(var(--icon-size) * 0.8); /* 80% of icon size */
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
+            width: calc(var(--icon-size) * 0.8);
+            height: calc(var(--icon-size) * 0.8);
+        }
+
+        .feature-fa-icon {
+            font-size: calc(var(--icon-size) * 0.7); /* 70% of icon size */
+            display: flex;
+            align-items: center;
+            width: calc(var(--icon-size) * 0.8);
+            height: calc(var(--icon-size) * 0.8);
+            justify-content: center;
         }
 
         .features {
             display: flex;
-            gap: 1px;
+            gap: var(--icon-spacing); /* Icons arası boşluk - user setting */
             align-items: center;
-        }
-
-        .feature-icon {
-            font-size: 0.65rem;
-            opacity: 0.8;
-            display: flex;
-            align-items: center;
-        }
-
-        .node-name {
-            flex: 1;
-            font-size: 0.8rem;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .line-number {
-            font-size: 0.65rem;
-            color: var(--vscode-descriptionForeground);
-            opacity: 0.7;
-            margin-left: auto;
         }
 
         /* Visibility Styling */
@@ -234,7 +277,7 @@ export class WebViewTemplateManager {
             text-align: center;
             color: var(--vscode-descriptionForeground);
             font-style: italic;
-            font-size: 0.8rem;
+            font-size: 0.9em; /* Relative to container font size */
         }
 
         /* Tooltip */
@@ -245,13 +288,14 @@ export class WebViewTemplateManager {
         .tooltip::after {
             content: attr(data-tooltip);
             position: absolute;
-            bottom: 125%;
-            left: 0;
+            top: 50%;
+            left: 0px; /* Icon'un sol hizasına yerleştir */
+            transform: translateY(-130%); /* Dikey olarak ortala */
             background-color: var(--vscode-editorHoverWidget-background);
             color: var(--vscode-editorHoverWidget-foreground);
             padding: var(--spacing-xs) var(--spacing-sm);
             border-radius: var(--border-radius);
-            font-size: 0.65rem;
+            font-size: var(--tooltip-font-size); /* Use tooltip font size setting */
             white-space: nowrap;
             opacity: 0;
             pointer-events: none;
@@ -261,8 +305,30 @@ export class WebViewTemplateManager {
             min-width: max-content;
         }
 
+        /* Tooltip'in sağ tarafa taştığı durumlarda sol tarafa göster */
+        .tooltip::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: calc(100% + 0px);
+            transform: translateY(0%);
+            width: 0;
+            height: 0;
+            pointer-events: none;
+            opacity: 0;
+            z-index: 999;
+        }
+        
         .tooltip:hover::after {
             opacity: 1;
+        }
+        
+        /* Container'ın sağ kenarına yakın tooltip'ler için alternatif pozisyon */
+        @media (max-width: 400px) {
+            .tooltip::after {
+                left: auto;
+                right: calc(100% + 8px);
+            }
         }
 
         /* Scrollbar */
@@ -321,7 +387,7 @@ export class WebViewTemplateManager {
         <div class="content">
             <div class="outline-section">
                 <div class="section-header">TS OUTLINER</div>
-                <div id="outline-container">
+                <div id="outline-container" class="outline-container">
                     <div class="empty-state">Loading...</div>
                 </div>
             </div>
@@ -365,6 +431,34 @@ export class WebViewTemplateManager {
                         "class": "📦",
                         "interface": "📋"
                     },
+                    fontAwesomeSettings: {
+                        "public": "fas fa-globe",
+                        "private": "fas fa-lock",
+                        "protected": "fas fa-shield-alt",
+                        "static": "fas fa-thumbtack",
+                        "readonly": "fas fa-book-open",
+                        "abstract": "fas fa-theater-masks",
+                        "async": "fas fa-bolt",
+                        "export": "fas fa-share-square",
+                        "default": "fas fa-star",
+                        "constructor": "fas fa-hammer",
+                        "property": "fas fa-tag",
+                        "method": "fas fa-cog",
+                        "function": "fas fa-wrench",
+                        "getter": "fas fa-download",
+                        "setter": "fas fa-upload",
+                        "class": "fas fa-cube",
+                        "interface": "fas fa-clipboard-list"
+                    },
+                    iconType: "emoji",
+                    fontFamily: "Consolas, 'Courier New', monospace",
+                    fontSize: 13,
+                    lineHeight: 1.2,
+                    iconSize: 16,
+                    iconSpacing: 4,
+                    iconToTextSpacing: 6,
+                    tooltipFontSize: 11,
+                    showTooltipPrefixes: false,
                     showIconsInLabel: true,
                     showVisibilityInLabel: false,
                     autoSelectCurrentElement: false,
@@ -384,8 +478,33 @@ export class WebViewTemplateManager {
 
             setSettings(newSettings) {
                 this.settings = { ...this.getDefaultSettings(), ...newSettings };
+                
+                // Font ayarlarını CSS değişkenlerine uygula
+                this.updateFontStyles();
+                
                 // Ayarlar değiştiğinde yeniden render et
                 this.render();
+            }
+
+            updateFontStyles() {
+                const container = document.getElementById('outline-container');
+                const sidebar = document.querySelector('.sidebar');
+                
+                if (container && this.settings.fontFamily) {
+                    container.style.setProperty('--outline-font-family', this.settings.fontFamily);
+                    container.style.setProperty('--outline-font-size', \`\${this.settings.fontSize}px\`);
+                    container.style.setProperty('--outline-line-height', this.settings.lineHeight.toString());
+                    container.style.setProperty('--icon-size', \`\${this.settings.iconSize}px\`);
+                    container.style.setProperty('--icon-spacing', \`\${this.settings.iconSpacing}px\`);
+                    container.style.setProperty('--icon-to-text-spacing', \`\${this.settings.iconToTextSpacing}px\`);
+                    container.style.setProperty('--tooltip-font-size', \`\${this.settings.tooltipFontSize}px\`);
+                }
+                
+                // Sidebar'a da font ayarlarını uygula (toolbar için)
+                if (sidebar) {
+                    sidebar.style.fontFamily = this.settings.fontFamily || 'var(--vscode-font-family)';
+                    sidebar.style.fontSize = \`\${this.settings.fontSize}px\` || 'var(--vscode-font-size)';
+                }
             }
 
             selectElementAtLine(line) {
@@ -531,8 +650,8 @@ export class WebViewTemplateManager {
                 // Build content HTML
                 content.innerHTML = \`
                     \${hasChildren ? '<span class="chevron">▶</span>' : '<span style="width: 0.75rem;"></span>'}
-                    \${state.settings.showIconsInLabel ? \`<span class="type-icon tooltip" data-tooltip="\${NodeRenderer.getTypeTooltip(node)}">\${IconManager.getTypeIcon(node.type)}</span>\` : ''}
                     <div class="features">
+                        \${state.settings.showIconsInLabel && state.settings.iconType !== 'none' ? \`<span class="\${IconManager.getIconClass()}" data-tooltip="\${NodeRenderer.getTypeTooltip(node)}">\${IconManager.getTypeIcon(node.type)}</span>\` : ''}
                         \${NodeRenderer.getFeatureIcons(node)}
                     </div>
                     <span class="node-name">\${NodeRenderer.getNodeDisplayName(node)}</span>
@@ -637,15 +756,18 @@ export class WebViewTemplateManager {
             static getFeatureIcons(node) {
                 const features = [];
                 
-                // showIconsInLabel ayarı false ise hiç ikon gösterme
-                if (!state.settings.showIconsInLabel) {
+                // showIconsInLabel ayarı false veya iconType none ise hiç ikon gösterme
+                if (!state.settings.showIconsInLabel || state.settings.iconType === 'none') {
                     return '';
                 }
                 
                 // Visibility ikonları her zaman göster (showIconsInLabel true ise)
                 const visIcon = IconManager.getVisibilityIcon(node.visibility);
                 if (visIcon) {
-                    features.push(\`<span class="feature-icon tooltip" data-tooltip="Visibility: \${node.visibility}">\${visIcon}</span>\`);
+                    const iconClass = state.settings.iconType === 'fontawesome' ? 'feature-fa-icon' : 'feature-icon';
+                    const visibilityName = node.visibility.charAt(0).toUpperCase() + node.visibility.slice(1);
+                    const tooltip = state.settings.showTooltipPrefixes ? \`Visibility: \${visibilityName}\` : visibilityName;
+                    features.push(\`<span class="\${iconClass} tooltip" data-tooltip="\${tooltip}">\${visIcon}</span>\`);
                 }
                 
                 // Modifiers - duplicate kontrolü ile
@@ -657,7 +779,9 @@ export class WebViewTemplateManager {
                     if (modifiers.includes('export') && modifiers.includes('default')) {
                         const defaultIcon = IconManager.getModifierIcon('default');
                         if (defaultIcon) {
-                            features.push(\`<span class="feature-icon tooltip" data-tooltip="Export Default">\${defaultIcon}</span>\`);
+                            const iconClass = state.settings.iconType === 'fontawesome' ? 'feature-fa-icon' : 'feature-icon';
+                            const tooltip = state.settings.showTooltipPrefixes ? 'Modifier: Export Default' : 'Export Default';
+                            features.push(\`<span class="\${iconClass} tooltip" data-tooltip="\${tooltip}">\${defaultIcon}</span>\`);
                         }
                         addedModifiers.add('export');
                         addedModifiers.add('default');
@@ -668,7 +792,10 @@ export class WebViewTemplateManager {
                         if (!addedModifiers.has(mod)) {
                             const icon = IconManager.getModifierIcon(mod);
                             if (icon) {
-                                features.push(\`<span class="feature-icon tooltip" data-tooltip="Modifier: \${mod}">\${icon}</span>\`);
+                                const iconClass = state.settings.iconType === 'fontawesome' ? 'feature-fa-icon' : 'feature-icon';
+                                const modifierName = mod.charAt(0).toUpperCase() + mod.slice(1);
+                                const tooltip = state.settings.showTooltipPrefixes ? \`Modifier: \${modifierName}\` : modifierName;
+                                features.push(\`<span class="\${iconClass} tooltip" data-tooltip="\${tooltip}">\${icon}</span>\`);
                                 addedModifiers.add(mod);
                             }
                         }
@@ -691,22 +818,47 @@ export class WebViewTemplateManager {
 
             static getTypeTooltip(node) {
                 const type = node.type.charAt(0).toUpperCase() + node.type.slice(1);
-                return \`\${type}: \${node.name}\`;
+                return state.settings.showTooltipPrefixes ? \`Type: \${type}\` : type;
             }
         }
 
         // Icon Management
         class IconManager {
+            static getIconClass() {
+                if (state.settings.iconType === 'fontawesome') {
+                    return 'fa-icon tooltip';
+                }
+                return 'type-icon tooltip';
+            }
+
             static getTypeIcon(type) {
-                return state.settings.emojiSettings[type] || '❓';
+                if (state.settings.iconType === 'fontawesome') {
+                    const faClass = state.settings.fontAwesomeSettings[type];
+                    return faClass ? \`<i class="\${faClass}"></i>\` : '<i class="fas fa-question"></i>';
+                } else if (state.settings.iconType === 'emoji') {
+                    return state.settings.emojiSettings[type] || '❓';
+                }
+                return ''; // none
             }
 
             static getVisibilityIcon(visibility) {
-                return state.settings.emojiSettings[visibility] || '';
+                if (state.settings.iconType === 'fontawesome') {
+                    const faClass = state.settings.fontAwesomeSettings[visibility];
+                    return faClass ? \`<i class="\${faClass}"></i>\` : '';
+                } else if (state.settings.iconType === 'emoji') {
+                    return state.settings.emojiSettings[visibility] || '';
+                }
+                return ''; // none
             }
 
             static getModifierIcon(modifier) {
-                return state.settings.emojiSettings[modifier] || '';
+                if (state.settings.iconType === 'fontawesome') {
+                    const faClass = state.settings.fontAwesomeSettings[modifier];
+                    return faClass ? \`<i class="\${faClass}"></i>\` : '';
+                } else if (state.settings.iconType === 'emoji') {
+                    return state.settings.emojiSettings[modifier] || '';
+                }
+                return ''; // none
             }
         }
 
@@ -781,6 +933,11 @@ export class WebViewTemplateManager {
                     break;
             }
         });
+
+        // İlk font ayarlarını uygula
+        setTimeout(() => {
+            state.updateFontStyles();
+        }, 100);
     `;
   }
 }

@@ -1,8 +1,27 @@
 # TS OUTLINER
 
-A comprehensive TypeScript outline extension for VS Code that enhances your development workflow with **smart navigation** and **customizable emoji icons**.
+A comprehensive TypeScript outline extension for VS Code that enhances your development workflow with **smart navigation**, **customizable icons** (emoji + FontAwesome), and **flexible typography**.
 
 ## ✨ Key Features
+
+### 🎯 Icon System Options
+
+- **🔤 Emoji Icons** - Universal emoji support (default)
+- **⭐ FontAwesome Icons** - Professional icon library
+- **❌ No Icons** - Clean, minimal interface
+
+### 🎨 Typography Control
+
+- **Custom Font Family** - Choose your favorite coding font
+- **Font Size Control** - 8-30px range for optimal readability
+- **Line Height Adjustment** - Fine-tune spacing (0.8-3.0x)
+
+### 🧠 Smart Features
+
+- **LSP-Based Analysis** - Accurate TypeScript symbol detection
+- **Auto-sync Navigation** - Cursor movement highlights outline elements
+- **Flexible Sorting** - Position, Name, or Category-based sorting
+- **Real-time Updates** - Seamless integration with TypeScript compiler
 
 ## 🧠 Technical Features
 
@@ -76,7 +95,29 @@ Combines multiple emojis for complex elements:
 
 ## 🎨 Complete Customization
 
-### 🎨 Emoji Settings (UPDATED!)
+### � Icon Type Selection (NEW!)
+
+Choose your preferred icon style:
+
+```json
+{
+  "tsOutlineEnhancer.iconType": "emoji" // "emoji", "fontawesome", "none"
+}
+```
+
+### 🎨 Typography Settings (NEW!)
+
+Customize the outline view appearance:
+
+```json
+{
+  "tsOutlineEnhancer.fontFamily": "Fira Code, JetBrains Mono, Consolas, monospace",
+  "tsOutlineEnhancer.fontSize": 14, // 8-30 px
+  "tsOutlineEnhancer.lineHeight": 1.3 // 0.8-3.0x
+}
+```
+
+### 🔤 Emoji Settings
 
 **Simple object-based emoji configuration** like `editor.quickSuggestions`:
 
@@ -102,6 +143,36 @@ Combines multiple emojis for complex elements:
 }
 ```
 
+### ⭐ FontAwesome Settings (NEW!)
+
+Professional icons using FontAwesome classes:
+
+```json
+{
+  "tsOutlineEnhancer.fontAwesomeSettings": {
+    "public": "fas fa-globe",
+    "private": "fas fa-lock",
+    "protected": "fas fa-shield-alt",
+    "static": "fas fa-thumbtack",
+    "readonly": "fas fa-book-open",
+    "abstract": "fas fa-theater-masks",
+    "async": "fas fa-bolt",
+    "constructor": "fas fa-hammer",
+    "property": "fas fa-tag",
+    "method": "fas fa-cog",
+    "function": "fas fa-wrench",
+    "getter": "fas fa-download",
+    "setter": "fas fa-upload",
+    "class": "fas fa-cube",
+    "interface": "fas fa-clipboard-list"
+  }
+}
+```
+
+}
+
+````
+
 **Quick setup:**
 
 1. Open Command Palette (`Ctrl+Shift+P`)
@@ -122,7 +193,7 @@ Combines multiple emojis for complex elements:
   "public": "●", "private": "○", "protected": "◐",
   "static": "■", "method": "▶", "class": "▦"
 }
-```
+````
 
 ### Behavior Settings
 
@@ -181,39 +252,52 @@ Combines multiple emojis for complex elements:
 
 ## 🎨 Theme Examples
 
-### Color-Coded Theme
+## 🎮 Command Palette
+
+Quick access to settings via Command Palette (`Ctrl+Shift+P`):
+
+- **TS Outliner: Open Icon Settings** - Choose icon type (emoji/fontawesome/none)
+- **TS Outliner: Open Font Settings** - Configure font family, size, line height
+- **TS Outliner: Open Emoji Settings** - Customize emoji icons
+- **TS Outliner: Refresh** - Manually refresh the outline view
+
+## 🎨 Example Configurations
+
+### Modern Developer Setup
 
 ```json
 {
-  "tsOutlineEnhancer.emojis.public": "🟢",
-  "tsOutlineEnhancer.emojis.private": "🔴",
-  "tsOutlineEnhancer.emojis.protected": "🟡",
-  "tsOutlineEnhancer.emojis.static": "🟦",
-  "tsOutlineEnhancer.emojis.readonly": "🟪"
+  "tsOutlineEnhancer.iconType": "fontawesome",
+  "tsOutlineEnhancer.fontFamily": "Fira Code, JetBrains Mono, monospace",
+  "tsOutlineEnhancer.fontSize": 14,
+  "tsOutlineEnhancer.lineHeight": 1.3,
+  "tsOutlineEnhancer.showIconsInLabel": true
 }
 ```
 
-### Professional Theme
+### Minimal Clean Setup
 
 ```json
 {
-  "tsOutlineEnhancer.emojis.class": "🏢",
-  "tsOutlineEnhancer.emojis.interface": "📄",
-  "tsOutlineEnhancer.emojis.method": "🔧",
-  "tsOutlineEnhancer.emojis.property": "📝",
-  "tsOutlineEnhancer.emojis.constructor": "🏗️"
+  "tsOutlineEnhancer.iconType": "none",
+  "tsOutlineEnhancer.fontFamily": "Consolas, monospace",
+  "tsOutlineEnhancer.fontSize": 12,
+  "tsOutlineEnhancer.lineHeight": 1.2
 }
 ```
 
-### Minimalist Theme
+### Color-Coded Emoji Theme
 
 ```json
 {
-  "tsOutlineEnhancer.emojis.public": "●",
-  "tsOutlineEnhancer.emojis.private": "○",
-  "tsOutlineEnhancer.emojis.protected": "◐",
-  "tsOutlineEnhancer.emojis.static": "■",
-  "tsOutlineEnhancer.emojis.async": "→"
+  "tsOutlineEnhancer.iconType": "emoji",
+  "tsOutlineEnhancer.emojiSettings": {
+    "public": "🟢",
+    "private": "🔴",
+    "protected": "🟡",
+    "static": "🟦",
+    "readonly": "🟪"
+  }
 }
 ```
 
