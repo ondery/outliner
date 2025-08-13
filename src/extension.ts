@@ -29,15 +29,18 @@ class TypeScriptOutlineProvider implements vscode.TreeDataProvider<TreeNode> {
   private nodes: TreeNode[] = [];
   private treeView?: vscode.TreeView<TreeNode>;
   public isOutlinerClick = false; // Outliner tıklaması flag'i - public yap
-  private sortMode: 'position' | 'name' | 'category' = 'position'; // Varsayılan sıralama
+  private sortMode: "position" | "name" | "category" = "position"; // Varsayılan sıralama
 
   setTreeView(treeView: vscode.TreeView<TreeNode>) {
     this.treeView = treeView;
-    
+
     // Ayarlardan sıralama modunu oku
     const config = vscode.workspace.getConfiguration("tsOutlineEnhancer");
-    this.sortMode = config.get<'position' | 'name' | 'category'>('sortMode', 'position');
-    
+    this.sortMode = config.get<"position" | "name" | "category">(
+      "sortMode",
+      "position"
+    );
+
     // Context'i güncelle
     this.updateSortModeContext();
   }
@@ -50,34 +53,50 @@ class TypeScriptOutlineProvider implements vscode.TreeDataProvider<TreeNode> {
   }
 
   // Sıralama metodları
-  setSortMode(mode: 'position' | 'name' | 'category'): void {
+  setSortMode(mode: "position" | "name" | "category"): void {
     this.sortMode = mode;
     this.applySorting();
     this.updateSortModeContext();
     this._onDidChangeTreeData.fire();
   }
 
-  getSortMode(): 'position' | 'name' | 'category' {
+  getSortMode(): "position" | "name" | "category" {
     return this.sortMode;
   }
 
   private updateSortModeContext(): void {
     // VS Code context'ini güncelle
-    vscode.commands.executeCommand('setContext', 'tsOutlineEnhancer.sortMode', this.sortMode);
-    vscode.commands.executeCommand('setContext', 'tsOutlineEnhancer.sortMode.position', this.sortMode === 'position');
-    vscode.commands.executeCommand('setContext', 'tsOutlineEnhancer.sortMode.name', this.sortMode === 'name');
-    vscode.commands.executeCommand('setContext', 'tsOutlineEnhancer.sortMode.category', this.sortMode === 'category');
+    vscode.commands.executeCommand(
+      "setContext",
+      "tsOutlineEnhancer.sortMode",
+      this.sortMode
+    );
+    vscode.commands.executeCommand(
+      "setContext",
+      "tsOutlineEnhancer.sortMode.position",
+      this.sortMode === "position"
+    );
+    vscode.commands.executeCommand(
+      "setContext",
+      "tsOutlineEnhancer.sortMode.name",
+      this.sortMode === "name"
+    );
+    vscode.commands.executeCommand(
+      "setContext",
+      "tsOutlineEnhancer.sortMode.category",
+      this.sortMode === "category"
+    );
   }
 
   private applySorting(): void {
     switch (this.sortMode) {
-      case 'name':
+      case "name":
         this.sortByName(this.nodes);
         break;
-      case 'category':
+      case "category":
         this.sortByCategory(this.nodes);
         break;
-      case 'position':
+      case "position":
       default:
         this.sortByPosition(this.nodes);
         break;
@@ -86,7 +105,7 @@ class TypeScriptOutlineProvider implements vscode.TreeDataProvider<TreeNode> {
 
   private sortByPosition(nodes: TreeNode[]): void {
     nodes.sort((a, b) => a.line - b.line);
-    nodes.forEach(node => {
+    nodes.forEach((node) => {
       if (node.children) {
         this.sortByPosition(node.children);
       }
@@ -95,7 +114,7 @@ class TypeScriptOutlineProvider implements vscode.TreeDataProvider<TreeNode> {
 
   private sortByName(nodes: TreeNode[]): void {
     nodes.sort((a, b) => a.name.localeCompare(b.name));
-    nodes.forEach(node => {
+    nodes.forEach((node) => {
       if (node.children) {
         this.sortByName(node.children);
       }
@@ -104,27 +123,27 @@ class TypeScriptOutlineProvider implements vscode.TreeDataProvider<TreeNode> {
 
   private sortByCategory(nodes: TreeNode[]): void {
     const categoryOrder = {
-      'class': 0,
-      'interface': 1,
-      'constructor': 2,
-      'property': 3,
-      'getter': 4,
-      'setter': 5,
-      'method': 6,
-      'function': 7
+      class: 0,
+      interface: 1,
+      constructor: 2,
+      property: 3,
+      getter: 4,
+      setter: 5,
+      method: 6,
+      function: 7,
     };
 
     nodes.sort((a, b) => {
       const aCategory = categoryOrder[a.type] ?? 999;
       const bCategory = categoryOrder[b.type] ?? 999;
-      
+
       if (aCategory === bCategory) {
         return a.name.localeCompare(b.name);
       }
       return aCategory - bCategory;
     });
 
-    nodes.forEach(node => {
+    nodes.forEach((node) => {
       if (node.children) {
         this.sortByCategory(node.children);
       }
@@ -1368,30 +1387,40 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  // MenuItemCheckbox API ile native checkbox behavior
-  const menuContributor = vscode.window.registerTreeDataProvider('menu', {
-    getChildren: () => [],
-    getTreeItem: () => new vscode.TreeItem('dummy')
-  });
-
   // Menu contributions'u dinamik olarak yönet
   function refreshMenus() {
     const currentSort = provider.getSortMode();
-    
+
     // Context'leri güncelle - bu VS Code'un native menu system'i ile çalışır
-    vscode.commands.executeCommand('setContext', 'tsOutlineEnhancer.sortMode.position', currentSort === 'position');
-    vscode.commands.executeCommand('setContext', 'tsOutlineEnhancer.sortMode.name', currentSort === 'name');
-    vscode.commands.executeCommand('setContext', 'tsOutlineEnhancer.sortMode.category', currentSort === 'category');
-    
+    vscode.commands.executeCommand(
+      "setContext",
+      "tsOutlineEnhancer.sortMode.position",
+      currentSort === "position"
+    );
+    vscode.commands.executeCommand(
+      "setContext",
+      "tsOutlineEnhancer.sortMode.name",
+      currentSort === "name"
+    );
+    vscode.commands.executeCommand(
+      "setContext",
+      "tsOutlineEnhancer.sortMode.category",
+      currentSort === "category"
+    );
+
     // Menu'yu refresh et
-    vscode.commands.executeCommand('setContext', 'tsOutlineEnhancer.menuRefresh', Date.now());
+    vscode.commands.executeCommand(
+      "setContext",
+      "tsOutlineEnhancer.menuRefresh",
+      Date.now()
+    );
   }
 
   // Sıralama komutları - native checkbox effect ile
   const sortByPositionCommand = vscode.commands.registerCommand(
     "tsOutlineEnhancer.sortByPosition",
     () => {
-      provider.setSortMode('position');
+      provider.setSortMode("position");
       refreshMenus();
       vscode.window.showInformationMessage("Sorted by position");
     }
@@ -1400,7 +1429,7 @@ export function activate(context: vscode.ExtensionContext) {
   const sortByNameCommand = vscode.commands.registerCommand(
     "tsOutlineEnhancer.sortByName",
     () => {
-      provider.setSortMode('name');
+      provider.setSortMode("name");
       refreshMenus();
       vscode.window.showInformationMessage("Sorted by name");
     }
@@ -1409,7 +1438,7 @@ export function activate(context: vscode.ExtensionContext) {
   const sortByCategoryCommand = vscode.commands.registerCommand(
     "tsOutlineEnhancer.sortByCategory",
     () => {
-      provider.setSortMode('category');
+      provider.setSortMode("category");
       refreshMenus();
       vscode.window.showInformationMessage("Sorted by category");
     }
@@ -1419,7 +1448,7 @@ export function activate(context: vscode.ExtensionContext) {
   const sortByPositionCheckedCommand = vscode.commands.registerCommand(
     "tsOutlineEnhancer.sortByPositionChecked",
     () => {
-      provider.setSortMode('position');
+      provider.setSortMode("position");
       refreshMenus();
       vscode.window.showInformationMessage("Sorted by position");
     }
@@ -1428,7 +1457,7 @@ export function activate(context: vscode.ExtensionContext) {
   const sortByNameCheckedCommand = vscode.commands.registerCommand(
     "tsOutlineEnhancer.sortByNameChecked",
     () => {
-      provider.setSortMode('name');
+      provider.setSortMode("name");
       refreshMenus();
       vscode.window.showInformationMessage("Sorted by name");
     }
@@ -1437,40 +1466,58 @@ export function activate(context: vscode.ExtensionContext) {
   const sortByCategoryCheckedCommand = vscode.commands.registerCommand(
     "tsOutlineEnhancer.sortByCategoryChecked",
     () => {
-      provider.setSortMode('category');
+      provider.setSortMode("category");
       refreshMenus();
       vscode.window.showInformationMessage("Sorted by category");
     }
   );
 
   // MenuItemCheckbox için state döndüren command'lar
-  vscode.commands.registerCommand('tsOutlineEnhancer.sortByPosition.isChecked', () => {
-    return provider.getSortMode() === 'position';
-  });
+  vscode.commands.registerCommand(
+    "tsOutlineEnhancer.sortByPosition.isChecked",
+    () => {
+      return provider.getSortMode() === "position";
+    }
+  );
 
-  vscode.commands.registerCommand('tsOutlineEnhancer.sortByName.isChecked', () => {
-    return provider.getSortMode() === 'name';
-  });
+  vscode.commands.registerCommand(
+    "tsOutlineEnhancer.sortByName.isChecked",
+    () => {
+      return provider.getSortMode() === "name";
+    }
+  );
 
-  vscode.commands.registerCommand('tsOutlineEnhancer.sortByCategory.isChecked', () => {
-    return provider.getSortMode() === 'category';
-  });
+  vscode.commands.registerCommand(
+    "tsOutlineEnhancer.sortByCategory.isChecked",
+    () => {
+      return provider.getSortMode() === "category";
+    }
+  );
 
   // İlk yüklemede default context'i set et
   refreshMenus();
 
   // Menu item'ları checkbox olarak register et
-  vscode.commands.registerCommand('tsOutlineEnhancer.getSortByPositionState', () => {
-    return provider.getSortMode() === 'position';
-  });
+  vscode.commands.registerCommand(
+    "tsOutlineEnhancer.getSortByPositionState",
+    () => {
+      return provider.getSortMode() === "position";
+    }
+  );
 
-  vscode.commands.registerCommand('tsOutlineEnhancer.getSortByNameState', () => {
-    return provider.getSortMode() === 'name';
-  });
+  vscode.commands.registerCommand(
+    "tsOutlineEnhancer.getSortByNameState",
+    () => {
+      return provider.getSortMode() === "name";
+    }
+  );
 
-  vscode.commands.registerCommand('tsOutlineEnhancer.getSortByCategoryState', () => {
-    return provider.getSortMode() === 'category';
-  });
+  vscode.commands.registerCommand(
+    "tsOutlineEnhancer.getSortByCategoryState",
+    () => {
+      return provider.getSortMode() === "category";
+    }
+  );
 
   // Auto refresh
   const onDidChangeTextDocument = vscode.workspace.onDidChangeTextDocument(
@@ -1528,12 +1575,15 @@ export function activate(context: vscode.ExtensionContext) {
         // Sıralama modu değiştiğinde güncelle
         if (e.affectsConfiguration("tsOutlineEnhancer.sortMode")) {
           const config = vscode.workspace.getConfiguration("tsOutlineEnhancer");
-          const newSortMode = config.get<'position' | 'name' | 'category'>('sortMode', 'position');
+          const newSortMode = config.get<"position" | "name" | "category">(
+            "sortMode",
+            "position"
+          );
           provider.setSortMode(newSortMode);
         } else {
           provider.refresh().catch(console.error);
         }
-        
+
         vscode.window.showInformationMessage("TS Outliner settings updated!");
       }
     }
@@ -1547,7 +1597,6 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     treeView,
-    menuContributor,
     refreshCommand,
     goToLineCommand,
     openEmojiSettingsCommand,

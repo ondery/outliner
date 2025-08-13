@@ -126,13 +126,13 @@ Combines multiple emojis for complex elements:
 
 ### Behavior Settings
 
-| Setting                                      | Default                   | Description                                                            |
-| -------------------------------------------- | ------------------------- | ---------------------------------------------------------------------- |
-| `tsOutlineEnhancer.showIconsInLabel`         | `true`                    | Show emoji icons in labels                                             |
-| `tsOutlineEnhancer.showVisibilityInLabel`    | `false`                   | Show visibility text in brackets                                       |
-| `tsOutlineEnhancer.autoSelectCurrentElement` | `false`                   | **Smart navigation**: Auto-highlight current element when cursor moves |
-| `tsOutlineEnhancer.sortMode`                 | `"position"`              | **Default sorting**: Position, Name, or Category                        |
-| `tsOutlineEnhancer.emojiSettings`            | `{ ... }` (object)        | **Emoji configuration**: Object with emoji properties for all elements |
+| Setting                                      | Default            | Description                                                            |
+| -------------------------------------------- | ------------------ | ---------------------------------------------------------------------- |
+| `tsOutlineEnhancer.showIconsInLabel`         | `true`             | Show emoji icons in labels                                             |
+| `tsOutlineEnhancer.showVisibilityInLabel`    | `false`            | Show visibility text in brackets                                       |
+| `tsOutlineEnhancer.autoSelectCurrentElement` | `false`            | **Smart navigation**: Auto-highlight current element when cursor moves |
+| `tsOutlineEnhancer.sortMode`                 | `"position"`       | **Default sorting**: Position, Name, or Category                       |
+| `tsOutlineEnhancer.emojiSettings`            | `{ ... }` (object) | **Emoji configuration**: Object with emoji properties for all elements |
 
 ## 🚀 Getting Started
 
@@ -273,4 +273,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## 📄 License
 
 MIT © 2025
-````
+
+```
+
+```

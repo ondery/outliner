@@ -44,7 +44,7 @@
       },
       {
         "command": "tsOutlineEnhancer.sortByName",
-        "title": "Sort By: Name", 
+        "title": "Sort By: Name",
         "category": "TS Outliner"
       },
       {
@@ -59,7 +59,7 @@
       },
       {
         "command": "tsOutlineEnhancer.sortByNameChecked",
-        "title": "$(check) Sort By: Name", 
+        "title": "$(check) Sort By: Name",
         "category": "TS Outliner"
       },
       {
@@ -72,7 +72,7 @@
       "TS OUTLINER": [
         {
           "id": "tsOutlineEnhancer",
-          "name": "TS OUTLINER",
+          "name": "TypeScript Enhanced Outline",
           "when": "resourceLangId == typescript || resourceLangId == typescriptreact",
           "icon": "$(symbol-class)"
         }
@@ -423,12 +423,16 @@
         },
         "tsOutlineEnhancer.sortMode": {
           "type": "string",
-          "enum": ["position", "name", "category"],
+          "enum": [
+            "position",
+            "name",
+            "category"
+          ],
           "default": "position",
           "description": "Default sorting mode for TypeScript outline elements",
           "enumDescriptions": [
             "Sort by position in source code",
-            "Sort alphabetically by name", 
+            "Sort alphabetically by name",
             "Sort by category (class, interface, constructor, property, method, function)"
           ]
         }
