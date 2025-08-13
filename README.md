@@ -26,6 +26,16 @@ A comprehensive TypeScript outline extension for VS Code that enhances your deve
 - **One-way sync**: Click outline items to navigate to code without interfering with auto-sync
 - **Center positioning**: Elements are positioned optimally in the outline view for better visibility
 
+## 📊 Smart Sorting
+
+**3 flexible sorting modes** accessible via the three-dot menu in outline header:
+
+- **📍 Sort By: Position** (default) - Elements ordered by their appearance in source code
+- **🔤 Sort By: Name** - Alphabetical sorting for easy navigation
+- **📂 Sort By: Category** - Logical grouping: Classes → Interfaces → Constructors → Properties → Getters → Setters → Methods → Functions
+
+**Quick access**: Click the `⋮` (three dots) button in the outline header to switch between sorting modes instantly.
+
 ## 🎨 Advanced Emoji System
 
 **15 customizable emoji categories** for complete visual control:
@@ -114,8 +124,6 @@ Combines multiple emojis for complex elements:
 }
 ```
 
-````
-
 ### Behavior Settings
 
 | Setting                                      | Default                   | Description                                                            |
@@ -123,6 +131,7 @@ Combines multiple emojis for complex elements:
 | `tsOutlineEnhancer.showIconsInLabel`         | `true`                    | Show emoji icons in labels                                             |
 | `tsOutlineEnhancer.showVisibilityInLabel`    | `false`                   | Show visibility text in brackets                                       |
 | `tsOutlineEnhancer.autoSelectCurrentElement` | `false`                   | **Smart navigation**: Auto-highlight current element when cursor moves |
+| `tsOutlineEnhancer.sortMode`                 | `"position"`              | **Default sorting**: Position, Name, or Category                        |
 | `tsOutlineEnhancer.emojiSettings`            | `{ ... }` (object)        | **Emoji configuration**: Object with emoji properties for all elements |
 
 ## 🚀 Getting Started
@@ -246,6 +255,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - ✨ Enhanced **Visibility Detection** - accurate public/private/protected analysis from TypeScript compiler
 - ✨ Improved **Getter/Setter Recognition** with both LSP and source code analysis
 - ✨ Better **Modifier Detection** (static, async, abstract, readonly) through language server
+- ✨ Added **Smart Sorting System** - 3 sorting modes accessible via three-dot menu (Position, Name, Category)
+- 🔧 Added **Persistent Sort Preference** - remembers your sorting choice in settings
 - 🐛 Fixed **Constructor Visibility** parsing for TypeScript-specific patterns
 - ⚡ **Performance Improvement**: Leverages VS Code's built-in TypeScript analysis
 - 🎯 **Better Accuracy**: Eliminates false positives from regex-based detection

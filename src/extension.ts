@@ -29,15 +29,106 @@ class TypeScriptOutlineProvider implements vscode.TreeDataProvider<TreeNode> {
   private nodes: TreeNode[] = [];
   private treeView?: vscode.TreeView<TreeNode>;
   public isOutlinerClick = false; // Outliner tıklaması flag'i - public yap
+  private sortMode: 'position' | 'name' | 'category' = 'position'; // Varsayılan sıralama
 
   setTreeView(treeView: vscode.TreeView<TreeNode>) {
     this.treeView = treeView;
+    
+    // Ayarlardan sıralama modunu oku
+    const config = vscode.workspace.getConfiguration("tsOutlineEnhancer");
+    this.sortMode = config.get<'position' | 'name' | 'category'>('sortMode', 'position');
+    
+    // Context'i güncelle
+    this.updateSortModeContext();
   }
 
   async refresh(): Promise<void> {
     this.nodes = await this.parseTypeScriptFile();
+    this.applySorting();
     console.log(`Refreshed outline: Found ${this.nodes.length} nodes`);
     this._onDidChangeTreeData.fire();
+  }
+
+  // Sıralama metodları
+  setSortMode(mode: 'position' | 'name' | 'category'): void {
+    this.sortMode = mode;
+    this.applySorting();
+    this.updateSortModeContext();
+    this._onDidChangeTreeData.fire();
+  }
+
+  getSortMode(): 'position' | 'name' | 'category' {
+    return this.sortMode;
+  }
+
+  private updateSortModeContext(): void {
+    // VS Code context'ini güncelle
+    vscode.commands.executeCommand('setContext', 'tsOutlineEnhancer.sortMode', this.sortMode);
+    vscode.commands.executeCommand('setContext', 'tsOutlineEnhancer.sortMode.position', this.sortMode === 'position');
+    vscode.commands.executeCommand('setContext', 'tsOutlineEnhancer.sortMode.name', this.sortMode === 'name');
+    vscode.commands.executeCommand('setContext', 'tsOutlineEnhancer.sortMode.category', this.sortMode === 'category');
+  }
+
+  private applySorting(): void {
+    switch (this.sortMode) {
+      case 'name':
+        this.sortByName(this.nodes);
+        break;
+      case 'category':
+        this.sortByCategory(this.nodes);
+        break;
+      case 'position':
+      default:
+        this.sortByPosition(this.nodes);
+        break;
+    }
+  }
+
+  private sortByPosition(nodes: TreeNode[]): void {
+    nodes.sort((a, b) => a.line - b.line);
+    nodes.forEach(node => {
+      if (node.children) {
+        this.sortByPosition(node.children);
+      }
+    });
+  }
+
+  private sortByName(nodes: TreeNode[]): void {
+    nodes.sort((a, b) => a.name.localeCompare(b.name));
+    nodes.forEach(node => {
+      if (node.children) {
+        this.sortByName(node.children);
+      }
+    });
+  }
+
+  private sortByCategory(nodes: TreeNode[]): void {
+    const categoryOrder = {
+      'class': 0,
+      'interface': 1,
+      'constructor': 2,
+      'property': 3,
+      'getter': 4,
+      'setter': 5,
+      'method': 6,
+      'function': 7
+    };
+
+    nodes.sort((a, b) => {
+      const aCategory = categoryOrder[a.type] ?? 999;
+      const bCategory = categoryOrder[b.type] ?? 999;
+      
+      if (aCategory === bCategory) {
+        return a.name.localeCompare(b.name);
+      }
+      return aCategory - bCategory;
+    });
+
+    nodes.forEach(node => {
+      if (node.children) {
+        this.sortByCategory(node.children);
+      }
+    });
   }
 
   selectCurrentElement(lineNumber: number): void {
@@ -1277,6 +1368,110 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  // MenuItemCheckbox API ile native checkbox behavior
+  const menuContributor = vscode.window.registerTreeDataProvider('menu', {
+    getChildren: () => [],
+    getTreeItem: () => new vscode.TreeItem('dummy')
+  });
+
+  // Menu contributions'u dinamik olarak yönet
+  function refreshMenus() {
+    const currentSort = provider.getSortMode();
+    
+    // Context'leri güncelle - bu VS Code'un native menu system'i ile çalışır
+    vscode.commands.executeCommand('setContext', 'tsOutlineEnhancer.sortMode.position', currentSort === 'position');
+    vscode.commands.executeCommand('setContext', 'tsOutlineEnhancer.sortMode.name', currentSort === 'name');
+    vscode.commands.executeCommand('setContext', 'tsOutlineEnhancer.sortMode.category', currentSort === 'category');
+    
+    // Menu'yu refresh et
+    vscode.commands.executeCommand('setContext', 'tsOutlineEnhancer.menuRefresh', Date.now());
+  }
+
+  // Sıralama komutları - native checkbox effect ile
+  const sortByPositionCommand = vscode.commands.registerCommand(
+    "tsOutlineEnhancer.sortByPosition",
+    () => {
+      provider.setSortMode('position');
+      refreshMenus();
+      vscode.window.showInformationMessage("Sorted by position");
+    }
+  );
+
+  const sortByNameCommand = vscode.commands.registerCommand(
+    "tsOutlineEnhancer.sortByName",
+    () => {
+      provider.setSortMode('name');
+      refreshMenus();
+      vscode.window.showInformationMessage("Sorted by name");
+    }
+  );
+
+  const sortByCategoryCommand = vscode.commands.registerCommand(
+    "tsOutlineEnhancer.sortByCategory",
+    () => {
+      provider.setSortMode('category');
+      refreshMenus();
+      vscode.window.showInformationMessage("Sorted by category");
+    }
+  );
+
+  // Checked state command'lar - aynı işlevi yapar ama $(check) icon ile
+  const sortByPositionCheckedCommand = vscode.commands.registerCommand(
+    "tsOutlineEnhancer.sortByPositionChecked",
+    () => {
+      provider.setSortMode('position');
+      refreshMenus();
+      vscode.window.showInformationMessage("Sorted by position");
+    }
+  );
+
+  const sortByNameCheckedCommand = vscode.commands.registerCommand(
+    "tsOutlineEnhancer.sortByNameChecked",
+    () => {
+      provider.setSortMode('name');
+      refreshMenus();
+      vscode.window.showInformationMessage("Sorted by name");
+    }
+  );
+
+  const sortByCategoryCheckedCommand = vscode.commands.registerCommand(
+    "tsOutlineEnhancer.sortByCategoryChecked",
+    () => {
+      provider.setSortMode('category');
+      refreshMenus();
+      vscode.window.showInformationMessage("Sorted by category");
+    }
+  );
+
+  // MenuItemCheckbox için state döndüren command'lar
+  vscode.commands.registerCommand('tsOutlineEnhancer.sortByPosition.isChecked', () => {
+    return provider.getSortMode() === 'position';
+  });
+
+  vscode.commands.registerCommand('tsOutlineEnhancer.sortByName.isChecked', () => {
+    return provider.getSortMode() === 'name';
+  });
+
+  vscode.commands.registerCommand('tsOutlineEnhancer.sortByCategory.isChecked', () => {
+    return provider.getSortMode() === 'category';
+  });
+
+  // İlk yüklemede default context'i set et
+  refreshMenus();
+
+  // Menu item'ları checkbox olarak register et
+  vscode.commands.registerCommand('tsOutlineEnhancer.getSortByPositionState', () => {
+    return provider.getSortMode() === 'position';
+  });
+
+  vscode.commands.registerCommand('tsOutlineEnhancer.getSortByNameState', () => {
+    return provider.getSortMode() === 'name';
+  });
+
+  vscode.commands.registerCommand('tsOutlineEnhancer.getSortByCategoryState', () => {
+    return provider.getSortMode() === 'category';
+  });
+
   // Auto refresh
   const onDidChangeTextDocument = vscode.workspace.onDidChangeTextDocument(
     (e) => {
@@ -1330,7 +1525,15 @@ export function activate(context: vscode.ExtensionContext) {
   const onDidChangeConfiguration = vscode.workspace.onDidChangeConfiguration(
     (e) => {
       if (e.affectsConfiguration("tsOutlineEnhancer")) {
-        provider.refresh().catch(console.error);
+        // Sıralama modu değiştiğinde güncelle
+        if (e.affectsConfiguration("tsOutlineEnhancer.sortMode")) {
+          const config = vscode.workspace.getConfiguration("tsOutlineEnhancer");
+          const newSortMode = config.get<'position' | 'name' | 'category'>('sortMode', 'position');
+          provider.setSortMode(newSortMode);
+        } else {
+          provider.refresh().catch(console.error);
+        }
+        
         vscode.window.showInformationMessage("TS Outliner settings updated!");
       }
     }
@@ -1344,9 +1547,16 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     treeView,
+    menuContributor,
     refreshCommand,
     goToLineCommand,
     openEmojiSettingsCommand,
+    sortByPositionCommand,
+    sortByNameCommand,
+    sortByCategoryCommand,
+    sortByPositionCheckedCommand,
+    sortByNameCheckedCommand,
+    sortByCategoryCheckedCommand,
     onDidChangeTextDocument,
     onDidChangeActiveTextEditor,
     onDidChangeTextEditorSelection,
