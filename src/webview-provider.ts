@@ -68,6 +68,10 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
         case "refresh":
           await this.refresh();
           break;
+        case "selectFont":
+          // Font seçim komutunu çalıştır
+          vscode.commands.executeCommand("typescriptOutliner.selectFont");
+          break;
         default:
           this.outputChannel.appendLine(
             `Unknown message type: ${message.type}`
@@ -100,9 +104,13 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
    * Sıralama modunu değiştirir ve UI'ı günceller
    */
   public setSortMode(mode: SortMode): void {
+    this.outputChannel.appendLine(`setSortMode called with mode: ${mode}`);
     this.sortMode = mode;
     this.applySorting();
     this.updateWebview();
+    this.outputChannel.appendLine(
+      `setSortMode completed. Current mode: ${this.sortMode}`
+    );
   }
 
   /**
@@ -136,13 +144,13 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
         "autoRevealCurrentElement",
         false
       );
-      const sortMode = config.get("sortMode", "position") as SortMode;
 
-      // sortMode'u senkronize et
-      if (this.sortMode !== sortMode) {
-        this.sortMode = sortMode;
-        this.applySorting();
-      }
+      // Sort butonuna tıklandığında manuel sort yapıldığı için settings'ten sortMode almayalım
+      // this.sortMode zaten doğru değerde
+
+      this.outputChannel.appendLine(
+        `Updating webview with sortMode: ${this.sortMode}, nodes: ${this.nodes.length}`
+      );
 
       this._view.webview.postMessage({
         type: "updateOutline",
@@ -394,6 +402,43 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
    * Mevcut node'ları seçili sıralama moduna göre sıralar
    */
   private applySorting(): void {
-    OutlineSorter.sortNodes(this.nodes, this.sortMode);
+    this.outputChannel.appendLine(
+      `applySorting: Current sortMode: ${this.sortMode}, nodes count: ${this.nodes.length}`
+    );
+
+    // Tüm node'ların detaylı bilgilerini log'la (children dahil)
+    this.logNodeStructure(this.nodes, 0);
+
+    // Sıralama öncesi ilk 3 node'un adını log'la
+    const beforeSort = this.nodes
+      .slice(0, 3)
+      .map((n) => `${n.name}(${n.type}, line:${n.line})`);
+    this.outputChannel.appendLine(`Before sort: ${beforeSort.join(", ")}`);
+
+    // CRITICAL: Sorted nodes'u yakalayıp this.nodes'a atamamız gerekiyor
+    this.nodes = OutlineSorter.sortNodes(this.nodes, this.sortMode);
+
+    // Sıralama sonrası ilk 3 node'un adını log'la
+    const afterSort = this.nodes
+      .slice(0, 3)
+      .map((n) => `${n.name}(${n.type}, line:${n.line})`);
+    this.outputChannel.appendLine(`After sort: ${afterSort.join(", ")}`);
+  }
+
+  /**
+   * Node yapısını recursive olarak log'lar
+   */
+  private logNodeStructure(nodes: TreeNode[], indent: number): void {
+    const spaces = "  ".repeat(indent);
+    nodes.forEach((node) => {
+      this.outputChannel.appendLine(
+        `${spaces}${node.name}(${node.type}, line:${node.line}) - children: ${
+          node.children?.length || 0
+        }`
+      );
+      if (node.children && node.children.length > 0) {
+        this.logNodeStructure(node.children, indent + 1);
+      }
+    });
   }
 }

@@ -155,6 +155,14 @@ export class WebViewTemplateManager {
         }
 
         .btn.active {
+            background: rgba(255, 255, 255, 0.16);
+            border-color: var(--vscode-focusBorder);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+            font-weight: 600;
+            /* transform: translateY(1px); */
+        }
+
+        .btn.active:hover {
             background: var(--vscode-button-hoverBackground);
             border-color: var(--vscode-focusBorder);
         }
@@ -365,6 +373,10 @@ export class WebViewTemplateManager {
                 <span>📁</span>
                 <span>Collapse All</span>
             </button>
+            <button class="btn" id="select-font-btn" title="Select Font Family">
+                <span>🔤</span>
+                <span>Font</span>
+            </button>
             <div style="width: 1px; height: 1rem; background: var(--vscode-panel-border); margin: 0 var(--spacing-xs);"></div>
             <button class="btn" id="sort-position" title="Sort by position in file">
                 <span>📍</span>
@@ -571,13 +583,19 @@ export class WebViewTemplateManager {
             }
 
             updateToolbar() {
+                console.log('updateToolbar called, sortMode:', this.sortMode);
+                
                 document.querySelectorAll('.toolbar .btn[id^="sort-"]').forEach(btn => {
                     btn.classList.remove('active');
+                    console.log('Removed active from:', btn.id);
                 });
                 
                 const activeBtn = document.getElementById(\`sort-\${this.sortMode}\`);
                 if (activeBtn) {
                     activeBtn.classList.add('active');
+                    console.log('Added active to:', activeBtn.id);
+                } else {
+                    console.error('Active button not found for sortMode:', this.sortMode);
                 }
             }
 
@@ -905,17 +923,53 @@ export class WebViewTemplateManager {
             Utils.collapseAll();
         });
 
-        document.getElementById('sort-position').addEventListener('click', () => {
-            vscode.postMessage({ type: 'sortBy', mode: 'position' });
+        document.getElementById('select-font-btn').addEventListener('click', () => {
+            vscode.postMessage({ type: 'selectFont' });
         });
 
-        document.getElementById('sort-name').addEventListener('click', () => {
-            vscode.postMessage({ type: 'sortBy', mode: 'name' });
+        // Sort butonlarını kontrol et ve event listener'ları ekle
+        const sortPositionBtn = document.getElementById('sort-position');
+        const sortNameBtn = document.getElementById('sort-name');
+        const sortCategoryBtn = document.getElementById('sort-category');
+        
+        console.log('Sort button elements:', { 
+            sortPositionBtn: !!sortPositionBtn, 
+            sortNameBtn: !!sortNameBtn, 
+            sortCategoryBtn: !!sortCategoryBtn 
         });
 
-        document.getElementById('sort-category').addEventListener('click', () => {
-            vscode.postMessage({ type: 'sortBy', mode: 'category' });
-        });
+        if (sortPositionBtn) {
+            sortPositionBtn.addEventListener('click', () => {
+                console.log('Sort position clicked');
+                state.setSortMode('position'); // Hemen UI'da aktif durumu göster
+                state.updateToolbar();
+                vscode.postMessage({ type: 'sortBy', mode: 'position' });
+            });
+        } else {
+            console.error('sort-position button not found');
+        }
+
+        if (sortNameBtn) {
+            sortNameBtn.addEventListener('click', () => {
+                console.log('Sort name clicked');
+                state.setSortMode('name'); // Hemen UI'da aktif durumu göster
+                state.updateToolbar();
+                vscode.postMessage({ type: 'sortBy', mode: 'name' });
+            });
+        } else {
+            console.error('sort-name button not found');
+        }
+
+        if (sortCategoryBtn) {
+            sortCategoryBtn.addEventListener('click', () => {
+                console.log('Sort category clicked');
+                state.setSortMode('category'); // Hemen UI'da aktif durumu göster
+                state.updateToolbar();
+                vscode.postMessage({ type: 'sortBy', mode: 'category' });
+            });
+        } else {
+            console.error('sort-category button not found');
+        }
 
         // Message Handler
         window.addEventListener('message', event => {
@@ -927,6 +981,8 @@ export class WebViewTemplateManager {
                     }
                     state.setNodes(message.nodes);
                     state.setSortMode(message.sortMode);
+                    // Toolbar'ı da güncelleyerek aktif sort butonunu göster
+                    state.updateToolbar();
                     break;
                 case 'selectElementAtLine':
                     state.selectElementAtLine(message.line);
@@ -937,6 +993,8 @@ export class WebViewTemplateManager {
         // İlk font ayarlarını uygula
         setTimeout(() => {
             state.updateFontStyles();
+            // İlk yüklemede toolbar'ı da güncelle
+            state.updateToolbar();
         }, 100);
     `;
   }
