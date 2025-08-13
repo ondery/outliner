@@ -72,7 +72,7 @@
       "TS OUTLINER": [
         {
           "id": "tsOutlineEnhancer",
-          "name": "TypeScript Enhanced Outline",
+          "name": "TS OUTLINER",
           "when": "resourceLangId == typescript || resourceLangId == typescriptreact",
           "icon": "$(symbol-class)"
         }

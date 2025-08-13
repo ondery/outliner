@@ -54,10 +54,14 @@ class TypeScriptOutlineProvider implements vscode.TreeDataProvider<TreeNode> {
 
   // Sıralama metodları
   setSortMode(mode: "position" | "name" | "category"): void {
+    console.log(
+      `Setting sort mode to: ${mode}, previous mode: ${this.sortMode}`
+    );
     this.sortMode = mode;
     this.applySorting();
     this.updateSortModeContext();
     this._onDidChangeTreeData.fire();
+    console.log(`Sort mode set successfully to: ${this.sortMode}`);
   }
 
   getSortMode(): "position" | "name" | "category" {
@@ -1391,6 +1395,8 @@ export function activate(context: vscode.ExtensionContext) {
   function refreshMenus() {
     const currentSort = provider.getSortMode();
 
+    console.log(`Refreshing menus - current sort mode: ${currentSort}`);
+
     // Context'leri güncelle - bu VS Code'un native menu system'i ile çalışır
     vscode.commands.executeCommand(
       "setContext",
@@ -1408,12 +1414,24 @@ export function activate(context: vscode.ExtensionContext) {
       currentSort === "category"
     );
 
-    // Menu'yu refresh et
-    vscode.commands.executeCommand(
-      "setContext",
-      "tsOutlineEnhancer.menuRefresh",
-      Date.now()
+    console.log(
+      `Context set - position: ${currentSort === "position"}, name: ${
+        currentSort === "name"
+      }, category: ${currentSort === "category"}`
     );
+
+    // Menu'yu zorla refresh et - biraz delay ile
+    setTimeout(() => {
+      vscode.commands.executeCommand(
+        "setContext",
+        "tsOutlineEnhancer.menuRefresh",
+        Date.now()
+      );
+      // Tree view'u da refresh et - bu menu'yu da tetikleyebilir
+      vscode.commands.executeCommand(
+        "workbench.actions.treeView.tsOutlineEnhancer.refresh"
+      );
+    }, 100);
   }
 
   // Sıralama komutları - native checkbox effect ile
