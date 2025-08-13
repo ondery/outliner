@@ -47,15 +47,11 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
 
     // Message handler - webview'den gelen mesajları işler
     webviewView.webview.onDidReceiveMessage(async (message) => {
-      this.outputChannel.appendLine(
-        `Received message: ${JSON.stringify(message)}`
-      );
       switch (message.type) {
         case "goToLine":
           this.goToLine(message.line);
           break;
         case "selectBlock":
-          this.outputChannel.appendLine(`Processing selectBlock message...`);
           this.selectBlock(
             message.line,
             message.name,
@@ -73,9 +69,7 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
           vscode.commands.executeCommand("typescriptOutliner.selectFont");
           break;
         default:
-          this.outputChannel.appendLine(
-            `Unknown message type: ${message.type}`
-          );
+          console.error(`Unknown message type: ${message.type}`);
       }
     });
 
@@ -104,13 +98,9 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
    * Sıralama modunu değiştirir ve UI'ı günceller
    */
   public setSortMode(mode: SortMode): void {
-    this.outputChannel.appendLine(`setSortMode called with mode: ${mode}`);
     this.sortMode = mode;
     this.applySorting();
     this.updateWebview();
-    this.outputChannel.appendLine(
-      `setSortMode completed. Current mode: ${this.sortMode}`
-    );
   }
 
   /**
@@ -147,10 +137,6 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
 
       // Sort butonuna tıklandığında manuel sort yapıldığı için settings'ten sortMode almayalım
       // this.sortMode zaten doğru değerde
-
-      this.outputChannel.appendLine(
-        `Updating webview with sortMode: ${this.sortMode}, nodes: ${this.nodes.length}`
-      );
 
       this._view.webview.postMessage({
         type: "updateOutline",
@@ -198,33 +184,19 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
     name: string,
     type: string
   ): Promise<void> {
-    this.outputChannel.appendLine(`=== selectBlock called ===`);
-    this.outputChannel.appendLine(
-      `Line: ${line}, Name: ${name}, Type: ${type}`
-    );
-    // Output panel'i otomatik açma - focus'u kaçırıyor
-
     const editor = vscode.window.activeTextEditor;
     if (!editor) {
-      this.outputChannel.appendLine("ERROR: No active editor found");
       vscode.window.showErrorMessage("No active editor found");
       return;
     }
 
     const document = editor.document;
-    this.outputChannel.appendLine(`Document URI: ${document.uri.toString()}`);
-    this.outputChannel.appendLine(`Document filename: ${document.fileName}`);
-    this.outputChannel.appendLine(`Document language: ${document.languageId}`);
 
     // OUTPUT panel veya log dosyasını ignore et, sadece TypeScript dosyalarını kabul et
     if (
       document.languageId !== "typescript" &&
       document.languageId !== "typescriptreact"
     ) {
-      this.outputChannel.appendLine(
-        `ERROR: Current editor is not a TypeScript file (language: ${document.languageId})`
-      );
-
       // TypeScript editör bul
       const tsEditor = vscode.window.visibleTextEditors.find(
         (e) =>
@@ -237,9 +209,6 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
         return;
       }
 
-      this.outputChannel.appendLine(
-        `Found TypeScript editor: ${tsEditor.document.fileName}`
-      );
       // TypeScript editörü aktif yap
       await vscode.window.showTextDocument(tsEditor.document);
       // Yeni aktif editörle işleme devam et
@@ -247,15 +216,9 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
     }
 
     const startLine = line; // Parser zaten 0-indexed veriyor, çevirme yok
-    this.outputChannel.appendLine(
-      `Document has ${document.lineCount} lines, input line was ${line}, using startLine: ${startLine}`
-    );
 
     // Başlangıç pozisyonunu bul
     if (startLine < 0 || startLine >= document.lineCount) {
-      this.outputChannel.appendLine(
-        `ERROR: Invalid line number. startLine: ${startLine}, document.lineCount: ${document.lineCount}`
-      );
       vscode.window.showErrorMessage(
         `Invalid line number: ${line} (document has ${document.lineCount} lines)`
       );
@@ -263,9 +226,6 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
     }
 
     const startPosition = new vscode.Position(startLine, 0);
-    this.outputChannel.appendLine(
-      `Line ${startLine + 1} content: "${document.lineAt(startLine).text}"`
-    );
 
     // Blok tipine göre end pozisyonunu hesapla
     let endLine = startLine;
@@ -273,30 +233,21 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
 
     // Blok sonunu bul
     if (type === "class" || type === "interface" || type === "enum") {
-      this.outputChannel.appendLine(`Searching for ${type} block end`);
       // Class/interface/enum için süslü parantezleri say
       let braceCount = 0;
       let foundFirstBrace = false;
 
       for (let i = startLine; i < totalLines; i++) {
         const lineText = document.lineAt(i).text;
-        this.outputChannel.appendLine(`Line ${i + 1}: ${lineText}`);
 
         for (const char of lineText) {
           if (char === "{") {
             braceCount++;
             foundFirstBrace = true;
-            this.outputChannel.appendLine(
-              `Found opening brace at line ${i + 1}, count: ${braceCount}`
-            );
           } else if (char === "}") {
             braceCount--;
-            this.outputChannel.appendLine(
-              `Found closing brace at line ${i + 1}, count: ${braceCount}`
-            );
             if (foundFirstBrace && braceCount === 0) {
               endLine = i;
-              this.outputChannel.appendLine(`Block ends at line ${i + 1}`);
               break;
             }
           }
@@ -305,30 +256,23 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
         if (foundFirstBrace && braceCount === 0) break;
       }
     } else if (type === "method" || type === "function") {
-      this.outputChannel.appendLine(`Searching for ${type} block end`);
       // Metod/fonksiyon için süslü parantezleri say
       let braceCount = 0;
       let foundFirstBrace = false;
 
       for (let i = startLine; i < totalLines; i++) {
         const lineText = document.lineAt(i).text;
-        this.outputChannel.appendLine(`Line ${i + 1}: ${lineText}`);
 
         // Arrow function kontrolü
         if (lineText.includes("=>")) {
-          this.outputChannel.appendLine("Detected arrow function");
           // Arrow function için farklı logic
           if (lineText.trim().endsWith(";")) {
             endLine = i;
-            this.outputChannel.appendLine(
-              `Single-line arrow function ends at line ${i + 1}`
-            );
             break;
           } else if (lineText.includes("{")) {
             // Multi-line arrow function
             braceCount = 1;
             foundFirstBrace = true;
-            this.outputChannel.appendLine("Multi-line arrow function detected");
             continue;
           }
         }
@@ -337,17 +281,10 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
           if (char === "{") {
             braceCount++;
             foundFirstBrace = true;
-            this.outputChannel.appendLine(
-              `Found opening brace at line ${i + 1}, count: ${braceCount}`
-            );
           } else if (char === "}") {
             braceCount--;
-            this.outputChannel.appendLine(
-              `Found closing brace at line ${i + 1}, count: ${braceCount}`
-            );
             if (foundFirstBrace && braceCount === 0) {
               endLine = i;
-              this.outputChannel.appendLine(`Block ends at line ${i + 1}`);
               break;
             }
           }
@@ -356,7 +293,6 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
         if (foundFirstBrace && braceCount === 0) break;
       }
     } else {
-      this.outputChannel.appendLine(`Simple selection for type: ${type}`);
       // Diğer tipler için sadece o satırı seç
       endLine = startLine;
     }
@@ -369,21 +305,9 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
     );
     const selection = new vscode.Selection(startPos, endPos);
 
-    this.outputChannel.appendLine(
-      `Creating selection from line ${startLine + 1} to ${endLine + 1}`
-    );
-    this.outputChannel.appendLine(
-      `Start pos: ${startPos.line}, ${startPos.character}`
-    );
-    this.outputChannel.appendLine(
-      `End pos: ${endPos.line}, ${endPos.character}`
-    );
-
     // Seçimi uygula ve görünüme getir
     editor.selection = selection;
     editor.revealRange(selection, vscode.TextEditorRevealType.InCenter);
-
-    this.outputChannel.appendLine("Selection applied successfully");
   }
 
   /**
@@ -402,43 +326,7 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
    * Mevcut node'ları seçili sıralama moduna göre sıralar
    */
   private applySorting(): void {
-    this.outputChannel.appendLine(
-      `applySorting: Current sortMode: ${this.sortMode}, nodes count: ${this.nodes.length}`
-    );
-
-    // Tüm node'ların detaylı bilgilerini log'la (children dahil)
-    this.logNodeStructure(this.nodes, 0);
-
-    // Sıralama öncesi ilk 3 node'un adını log'la
-    const beforeSort = this.nodes
-      .slice(0, 3)
-      .map((n) => `${n.name}(${n.type}, line:${n.line})`);
-    this.outputChannel.appendLine(`Before sort: ${beforeSort.join(", ")}`);
-
     // CRITICAL: Sorted nodes'u yakalayıp this.nodes'a atamamız gerekiyor
     this.nodes = OutlineSorter.sortNodes(this.nodes, this.sortMode);
-
-    // Sıralama sonrası ilk 3 node'un adını log'la
-    const afterSort = this.nodes
-      .slice(0, 3)
-      .map((n) => `${n.name}(${n.type}, line:${n.line})`);
-    this.outputChannel.appendLine(`After sort: ${afterSort.join(", ")}`);
-  }
-
-  /**
-   * Node yapısını recursive olarak log'lar
-   */
-  private logNodeStructure(nodes: TreeNode[], indent: number): void {
-    const spaces = "  ".repeat(indent);
-    nodes.forEach((node) => {
-      this.outputChannel.appendLine(
-        `${spaces}${node.name}(${node.type}, line:${node.line}) - children: ${
-          node.children?.length || 0
-        }`
-      );
-      if (node.children && node.children.length > 0) {
-        this.logNodeStructure(node.children, indent + 1);
-      }
-    });
   }
 }

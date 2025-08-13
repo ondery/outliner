@@ -11,22 +11,12 @@ export class OutlineSorter {
    * Ana sıralama fonksiyonu - nodes array'ini in-place sort eder ve yeni sorted array return eder
    */
   public static sortNodes(nodes: TreeNode[], sortMode: SortMode): TreeNode[] {
-    console.log(
-      `[OutlineSorter] Starting sort with mode: ${sortMode}, nodes count: ${nodes.length}`
-    );
-
     // Deep copy yaparak orijinal node'ları koruyalım
     const sortedNodes = this.deepCopyNodes(nodes);
 
     // Recursive sorting uygula
     this.applySortRecursive(sortedNodes, sortMode);
 
-    console.log(
-      `[OutlineSorter] Sort completed. First 3 nodes: ${sortedNodes
-        .slice(0, 3)
-        .map((n) => n.name)
-        .join(", ")}`
-    );
     return sortedNodes;
   }
 
@@ -64,9 +54,6 @@ export class OutlineSorter {
     // Her node'un children'ını da sırala
     nodes.forEach((node) => {
       if (node.children && node.children.length > 0) {
-        console.log(
-          `[OutlineSorter] Sorting ${node.children.length} children of ${node.name}`
-        );
         this.applySortRecursive(node.children, sortMode);
       }
     });
@@ -77,11 +64,7 @@ export class OutlineSorter {
    */
   private static sortByPosition(nodes: TreeNode[]): void {
     nodes.sort((a, b) => {
-      const result = a.line - b.line;
-      console.log(
-        `[OutlineSorter] Position sort: ${a.name}(${a.line}) vs ${b.name}(${b.line}) = ${result}`
-      );
-      return result;
+      return a.line - b.line;
     });
   }
 
@@ -90,11 +73,7 @@ export class OutlineSorter {
    */
   private static sortByName(nodes: TreeNode[]): void {
     nodes.sort((a, b) => {
-      const result = a.name.localeCompare(b.name);
-      console.log(
-        `[OutlineSorter] Name sort: ${a.name} vs ${b.name} = ${result}`
-      );
-      return result;
+      return a.name.localeCompare(b.name);
     });
   }
 
@@ -110,22 +89,11 @@ export class OutlineSorter {
 
       // Önce category
       if (aCategory !== bCategory) {
-        console.log(
-          `[OutlineSorter] Category sort: ${a.name}(${
-            a.type
-          }:${aCategory}) vs ${b.name}(${b.type}:${bCategory}) = ${
-            aCategory - bCategory
-          }`
-        );
         return aCategory - bCategory;
       }
 
       // Aynı category ise name'e göre
-      const result = a.name.localeCompare(b.name);
-      console.log(
-        `[OutlineSorter] Category sort (same type): ${a.name} vs ${b.name} = ${result}`
-      );
-      return result;
+      return a.name.localeCompare(b.name);
     });
   }
 

@@ -583,19 +583,13 @@ export class WebViewTemplateManager {
             }
 
             updateToolbar() {
-                console.log('updateToolbar called, sortMode:', this.sortMode);
-                
                 document.querySelectorAll('.toolbar .btn[id^="sort-"]').forEach(btn => {
                     btn.classList.remove('active');
-                    console.log('Removed active from:', btn.id);
                 });
                 
                 const activeBtn = document.getElementById(\`sort-\${this.sortMode}\`);
                 if (activeBtn) {
                     activeBtn.classList.add('active');
-                    console.log('Added active to:', activeBtn.id);
-                } else {
-                    console.error('Active button not found for sortMode:', this.sortMode);
                 }
             }
 
@@ -678,7 +672,6 @@ export class WebViewTemplateManager {
 
                 // Event listeners
                 content.addEventListener('click', (e) => {
-                    console.log('Click event triggered on:', node.name);
                     if (e.target.classList.contains('chevron')) {
                         e.stopPropagation();
                         NodeRenderer.toggleNode(nodeElement, nodeKey);
@@ -691,13 +684,8 @@ export class WebViewTemplateManager {
 
                 // Çift tıklama event listener'ı - bloğu seç
                 content.addEventListener('dblclick', (event) => {
-                    console.log('=== DOUBLE CLICK EVENT TRIGGERED ===');
-                    console.log('Event target:', event.target);
-                    console.log('Node data:', { line: node.line, name: node.name, type: node.type });
-                    
                     // Chevron'a double-click yapılmadığından emin ol
                     if (!event.target || !event.target.classList.contains('chevron')) {
-                        console.log('Processing double-click...');
                         event.preventDefault();
                         event.stopPropagation();
                         event.stopImmediatePropagation(); // Diğer event listener'ları engelle
@@ -712,11 +700,8 @@ export class WebViewTemplateManager {
                                 name: node.name,
                                 nodeType: node.type
                             };
-                            console.log('Sending message to backend:', JSON.stringify(message));
                             vscode.postMessage(message);
                         }, 10);
-                    } else {
-                        console.log('Double-click on chevron ignored');
                     }
                 });
 
@@ -932,43 +917,28 @@ export class WebViewTemplateManager {
         const sortNameBtn = document.getElementById('sort-name');
         const sortCategoryBtn = document.getElementById('sort-category');
         
-        console.log('Sort button elements:', { 
-            sortPositionBtn: !!sortPositionBtn, 
-            sortNameBtn: !!sortNameBtn, 
-            sortCategoryBtn: !!sortCategoryBtn 
-        });
-
         if (sortPositionBtn) {
             sortPositionBtn.addEventListener('click', () => {
-                console.log('Sort position clicked');
                 state.setSortMode('position'); // Hemen UI'da aktif durumu göster
                 state.updateToolbar();
                 vscode.postMessage({ type: 'sortBy', mode: 'position' });
             });
-        } else {
-            console.error('sort-position button not found');
         }
 
         if (sortNameBtn) {
             sortNameBtn.addEventListener('click', () => {
-                console.log('Sort name clicked');
                 state.setSortMode('name'); // Hemen UI'da aktif durumu göster
                 state.updateToolbar();
                 vscode.postMessage({ type: 'sortBy', mode: 'name' });
             });
-        } else {
-            console.error('sort-name button not found');
         }
 
         if (sortCategoryBtn) {
             sortCategoryBtn.addEventListener('click', () => {
-                console.log('Sort category clicked');
                 state.setSortMode('category'); // Hemen UI'da aktif durumu göster
                 state.updateToolbar();
                 vscode.postMessage({ type: 'sortBy', mode: 'category' });
             });
-        } else {
-            console.error('sort-category button not found');
         }
 
         // Message Handler
