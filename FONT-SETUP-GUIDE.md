@@ -1,74 +1,75 @@
 # FONT SETUP GUIDE - TS OUTLINER
 
-Bu rehber, TS Outliner extension'unda font ve ikon ayarlarını nasıl yapacağını açıklar.
+This guide explains how to configure fonts and icons in the TS Outliner extension.
 
-## İkon Türleri
+## Icon Types
 
-Extension üç farklı ikon türünü destekler:
+The extension supports three different icon types:
 
-### 1. 🔤 Emoji İkonlar (Varsayılan)
+### 1. 🔤 Emoji Icons (Default)
 
-- **Ayar**: `"tsOutlineEnhancer.iconType": "emoji"`
-- **Avantajlar**: Her yerde çalışır, kurulum gerektirmez
-- **Özelleştirme**: `tsOutlineEnhancer.emojiSettings` ile
+- **Setting**: `"tsOutlineEnhancer.iconType": "emoji"`
+- **Advantages**: Works everywhere, no installation required
+- **Customization**: Via `tsOutlineEnhancer.emojiSettings`
 
-### 2. ⭐ FontAwesome İkonlar
+### 2. ⭐ FontAwesome Icons
 
-- **Ayar**: `"tsOutlineEnhancer.iconType": "fontawesome"`
-- **Avantajlar**: Profesyonel görünüm, binlerce seçenek
-- **Gereksinimler**: FontAwesome font kurulumu (CDN otomatik yüklenir)
-- **Özelleştirme**: `tsOutlineEnhancer.fontAwesomeSettings` ile
+- **Setting**: `"tsOutlineEnhancer.iconType": "fontawesome"`
+- **Advantages**: Professional look, thousands of options
+- **Requirements**: FontAwesome font installation (CDN loads automatically)
+- **Customization**: Via `tsOutlineEnhancer.fontAwesomeSettings`
 
-### 3. ❌ İkon Yok
+### 3. ❌ No Icons
 
-- **Ayar**: `"tsOutlineEnhancer.iconType": "none"`
-- **Avantajlar**: Sade görünüm, hız
+- **Setting**: `"tsOutlineEnhancer.iconType": "none"`
+- **Advantages**: Clean look, faster performance
 
-## Font Family Ayarları
+## Font Family Settings
 
-### Önerilen Font Aileleri
+### Recommended Font Families
 
-1. **Fira Code** (Ligature desteği)
+1. **Fira Code** (Ligature support)
 
    ```json
    "tsOutlineEnhancer.fontFamily": "Fira Code, monospace"
    ```
 
-2. **JetBrains Mono** (Modern, okunabilir)
+2. **JetBrains Mono** (Modern, readable)
 
    ```json
    "tsOutlineEnhancer.fontFamily": "JetBrains Mono, monospace"
    ```
 
-3. **Cascadia Code** (Microsoft'un geliştirici fontu)
+3. **Cascadia Code** (Microsoft’s developer font)
 
    ```json
    "tsOutlineEnhancer.fontFamily": "Cascadia Code, monospace"
    ```
 
-4. **Source Code Pro** (Adobe'nin açık kaynak fontu)
+4. **Source Code Pro** (Adobe’s open-source font)
 
    ```json
    "tsOutlineEnhancer.fontFamily": "Source Code Pro, monospace"
    ```
 
-5. **Hack** (Özellikle kodlama için tasarlandı)
+5. **Hack** (Specifically designed for coding)
+
    ```json
    "tsOutlineEnhancer.fontFamily": "Hack, monospace"
    ```
 
-### Font Boyutu ve Satır Yüksekliği
+### Font Size and Line Height
 
 ```json
 {
-  "tsOutlineEnhancer.fontSize": 14, // 8-30 px arası
-  "tsOutlineEnhancer.lineHeight": 1.3 // 0.8-3.0 arası
+  "tsOutlineEnhancer.fontSize": 14, // between 8-30 px
+  "tsOutlineEnhancer.lineHeight": 1.3 // between 0.8-3.0
 }
 ```
 
-## Hızlı Kurulum
+## Quick Setup
 
-### Settings.json'a Ekle:
+### Add to Settings.json:
 
 ```json
 {
@@ -80,27 +81,27 @@ Extension üç farklı ikon türünü destekler:
 }
 ```
 
-## Komut Paleti Komutları
+## Command Palette Commands
 
-- `TS Outliner: Open Icon Settings` - İkon türü ayarları
-- `TS Outliner: Open Font Settings` - Font ayarları
-- `TS Outliner: Open Emoji Settings` - Emoji özelleştirmesi
+- `TS Outliner: Open Icon Settings` – Icon type settings
+- `TS Outliner: Open Font Settings` – Font settings
+- `TS Outliner: Open Emoji Settings` – Emoji customization
 
-## FontAwesome Kurulumu
+## FontAwesome Installation
 
-### Otomatik (CDN) - Varsayılan
+### Automatic (CDN) – Default
 
-Extension otomatik olarak FontAwesome CDN'den yükler. İnternet bağlantısı gerekli.
+The extension automatically loads FontAwesome from the CDN. Internet connection required.
 
-### Manuel Kurulum
+### Manual Installation
 
-1. [FontAwesome](https://fontawesome.com/) sitesinden fontları indir
-2. Sistem fontlarına yükle
-3. WebView'de CDN yerine lokal kullanım için extension kodunu düzenle
+1. Download fonts from [FontAwesome](https://fontawesome.com/)
+2. Install them to your system fonts
+3. Edit the extension code to use local fonts instead of CDN in the WebView
 
-## Özelleştirme Örnekleri
+## Customization Examples
 
-### Renkli Emoji Seti:
+### Colored Emoji Set:
 
 ```json
 {
@@ -114,7 +115,7 @@ Extension otomatik olarak FontAwesome CDN'den yükler. İnternet bağlantısı g
 }
 ```
 
-### Alternatif FontAwesome Seti:
+### Alternative FontAwesome Set:
 
 ```json
 {
@@ -128,22 +129,22 @@ Extension otomatik olarak FontAwesome CDN'den yükler. İnternet bağlantısı g
 }
 ```
 
-## Sorun Giderme
+## Troubleshooting
 
-**FontAwesome ikonları görünmüyor:**
+**FontAwesome icons not showing:**
 
-- İnternet bağlantını kontrol et
-- Browser cache'ini temizle
-- VS Code'u yeniden başlat
+- Check your internet connection
+- Clear browser cache
+- Restart VS Code
 
-**Font değişmiyor:**
+**Font not changing:**
 
-- VS Code'u yeniden başlat
-- Settings'in doğru kaydedildiğini kontrol et
-- Extension'u devre dışı bırakıp tekrar etkinleştir
+- Restart VS Code
+- Make sure settings are saved correctly
+- Disable and re-enable the extension
 
-**Performance sorunları:**
+**Performance issues:**
 
-- `iconType` ayarını `"none"` yap
-- `fontSize` değerini düşür
-- Emoji kullanmayı tercih et (FontAwesome yerine)
+- Set `iconType` to `"none"`
+- Lower the `fontSize` value
+- Prefer emojis instead of FontAwesome

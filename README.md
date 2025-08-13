@@ -1,20 +1,29 @@
 # TS OUTLINER
 
-A comprehensive TypeScript outline extension for VS Code that enhances your development workflow with **smart navigation**, **customizable icons** (emoji + FontAwesome), and **flexible typography**.
+A comprehensive TypeScript outline extension for VS Code that enhances your development workflow with **LSP-based analysis**, **customizable icons** (emoji + FontAwesome), **intelligent font detection**, and **smart sorting**.
 
 ## ✨ Key Features
+
+### 🧠 LSP-Based Analysis
+
+- **Language Server Protocol Integration** - Uses VS Code's built-in TypeScript language server for accurate symbol detection
+- **AST-Based Parsing** - Leverages Abstract Syntax Tree data for precise analysis
+- **Intelligent Fallback** - Automatically switches to text-based parsing when LSP is unavailable
+- **Real-time Updates** - Seamlessly integrates with TypeScript compiler's semantic analysis
 
 ### 🎯 Icon System Options
 
 - **🔤 Emoji Icons** - Universal emoji support (default)
-- **⭐ FontAwesome Icons** - Professional icon library
+- **⭐ FontAwesome Icons** - Professional icon library (requires FontAwesome installed)
 - **❌ No Icons** - Clean, minimal interface
 
-### 🎨 Typography Control
+### 🎨 Typography & Font Control
 
-- **Custom Font Family** - Choose your favorite coding font
+- **Intelligent Font Detection** - Automatically detects system fonts on Windows, macOS, and Linux
+- **Font Family Picker** - Interactive font selection with live preview
 - **Font Size Control** - 8-30px range for optimal readability
 - **Line Height Adjustment** - Fine-tune spacing (0.8-3.0x)
+- **Popular Programming Fonts** - Includes Fira Code, JetBrains Mono, Consolas, and more
 
 ### 🧠 Smart Features
 
@@ -38,6 +47,13 @@ A comprehensive TypeScript outline extension for VS Code that enhances your deve
 - **Advanced Getter/Setter Recognition**: Identifies TypeScript getter/setter patterns both from LSP and source analysis
 - **Static/Async/Abstract Detection**: Comprehensive modifier detection through language server integration
 - **Constructor Special Handling**: Proper TypeScript constructor visibility analysis
+
+### Smart Font System
+
+- **Cross-Platform Font Detection**: Automatically discovers system fonts on Windows, macOS, and Linux
+- **Categorized Font Selection**: Programming fonts, system fonts, serif fonts, and display fonts
+- **Interactive Font Picker**: Command palette integration with live preview
+- **Fallback Font Chains**: Robust font family fallbacks for optimal cross-platform compatibility
 
 ## 🎯 Smart Navigation
 
@@ -171,7 +187,7 @@ Professional icons using FontAwesome classes:
 
 }
 
-````
+````json
 
 **Quick setup:**
 
@@ -252,13 +268,15 @@ Professional icons using FontAwesome classes:
 
 ## 🎨 Theme Examples
 
-## 🎮 Command Palette
+## � Command Palette
 
 Quick access to settings via Command Palette (`Ctrl+Shift+P`):
 
+- **TS Outliner: Select Font Family** - Interactive font picker with system font detection
 - **TS Outliner: Open Icon Settings** - Choose icon type (emoji/fontawesome/none)
 - **TS Outliner: Open Font Settings** - Configure font family, size, line height
 - **TS Outliner: Open Emoji Settings** - Customize emoji icons
+- **TS Outliner: Open Icon Appearance Settings** - Icon display preferences
 - **TS Outliner: Refresh** - Manually refresh the outline view
 
 ## 🎨 Example Configurations
@@ -301,6 +319,18 @@ Quick access to settings via Command Palette (`Ctrl+Shift+P`):
 }
 ```
 
+### Interactive Font Selection
+
+Use the Command Palette:
+
+1. Open `Ctrl+Shift+P`
+2. Type `TS Outliner: Select Font Family`
+3. Choose from categorized fonts:
+   - Programming fonts (with ligatures)
+   - System fonts (platform optimized)
+   - Serif fonts (for documentation)
+   - Display fonts (for headers)
+
 ## 🛠️ Development
 
 ### Setup
@@ -323,6 +353,7 @@ npm run compile
 ```bash
 npm run compile    # Compile TypeScript
 npm run watch      # Watch mode for development
+npm run package    # Create VSIX package
 ```
 
 ## 🤝 Contributing
@@ -330,6 +361,17 @@ npm run watch      # Watch mode for development
 Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📋 Changelog
+
+### v0.0.4
+
+- 🎯 **Font Intelligence** - Added automatic system font detection for Windows, macOS, and Linux
+- ✨ **Interactive Font Picker** - New command `TS Outliner: Select Font Family` with categorized fonts
+- 🎨 **Enhanced Font Categories** - Programming fonts, system fonts, serif fonts, and display fonts
+- 🔧 **Command Palette Integration** - Added new commands for better settings access
+- ⚙️ **Icon Settings** - New icon configuration commands and improved settings structure
+- 📝 **Package.json Improvements** - Better command organization and descriptions
+- 🐛 **Font Fallback System** - Robust font family fallbacks for cross-platform compatibility
+- ⚡ **Performance** - Optimized font detection with proper error handling
 
 ### v0.0.3
 
@@ -356,8 +398,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
-MIT © 2025
-
-```
-
-```
+MIT © 2025 Öndery
