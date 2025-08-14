@@ -8,6 +8,8 @@ A comprehensive TypeScript outline extension for VS Code that enhances your deve
 
 - **Language Server Protocol Integration** - Uses VS Code's built-in TypeScript language server for accurate symbol detection
 - **AST-Based Parsing** - Leverages Abstract Syntax Tree data for precise analysis
+- **Perfect Block Selection** - LSP-powered selection handles complex constructors, object type parameters, and nested structures
+- **Smart Symbol Matching** - Intelligent range detection for reliable code navigation
 - **Intelligent Fallback** - Automatically switches to text-based parsing when LSP is unavailable
 - **Real-time Updates** - Seamlessly integrates with TypeScript compiler's semantic analysis
 
@@ -361,6 +363,17 @@ npm run package    # Create VSIX package
 Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📋 Changelog
+
+### v0.0.5
+
+- 🎯 **LSP-Based Block Selection** - Completely rewrote block selection logic using Language Server Protocol
+- ✨ **Perfect Constructor Selection** - Constructor blocks (including multi-line parameters) now select correctly
+- 🔧 **Object Type Parameter Support** - Functions with inline object type parameters (e.g., `data: { id: number }`) now work perfectly
+- ⚡ **Improved Accuracy** - Uses VS Code's DocumentSymbol API for precise range information instead of manual parsing
+- 🐛 **Fixed Block Selection Issues** - Eliminated all edge cases with nested objects, arrow functions, and complex signatures
+- 🛡️ **Fallback System** - Graceful fallback to single-line selection if LSP fails
+- 📊 **Enhanced Symbol Matching** - Smart symbol finding with line tolerance and recursive search
+- 🎨 **Better User Experience** - Reliable selection behavior across all TypeScript constructs
 
 ### v0.0.4
 
