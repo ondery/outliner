@@ -177,7 +177,7 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
   }
 
   /**
-   * Kod bloğunu (fonksiyon, class vb.) seç
+   * Kod bloğunu (fonksiyon, class vb.) seç - LSP range bilgisini kullanır
    */
   private async selectBlock(
     line: number,
@@ -215,99 +215,111 @@ export class TypeScriptWebviewProvider implements vscode.WebviewViewProvider {
       return this.selectBlock(line, name, type);
     }
 
-    const startLine = line; // Parser zaten 0-indexed veriyor, çevirme yok
+    try {
+      // LSP'den Document Symbol'ları al
+      const symbols = (await vscode.commands.executeCommand<
+        vscode.DocumentSymbol[]
+      >("vscode.executeDocumentSymbolProvider", document.uri)) as
+        | vscode.DocumentSymbol[]
+        | undefined;
 
-    // Başlangıç pozisyonunu bul
-    if (startLine < 0 || startLine >= document.lineCount) {
-      vscode.window.showErrorMessage(
-        `Invalid line number: ${line} (document has ${document.lineCount} lines)`
+      if (!symbols || symbols.length === 0) {
+        // Fallback: manuel seçim
+        this.fallbackSelection(line, document);
+        return;
+      }
+
+      // İlgili symbol'ı bul
+      const targetSymbol = this.findSymbolByLineAndName(
+        symbols,
+        line,
+        name,
+        type
       );
-      return;
+
+      if (targetSymbol) {
+        // LSP'den gelen range bilgisini kullan
+        const selection = new vscode.Selection(
+          targetSymbol.range.start,
+          targetSymbol.range.end
+        );
+
+        // Seçimi uygula ve görünüme getir
+        editor.selection = selection;
+        editor.revealRange(selection, vscode.TextEditorRevealType.InCenter);
+      } else {
+        // Symbol bulunamazsa fallback kullan
+        this.fallbackSelection(line, document);
+      }
+    } catch (error) {
+      console.error("Error using LSP for selection:", error);
+      // Hata durumunda fallback kullan
+      this.fallbackSelection(line, document);
+    }
+  }
+
+  /**
+   * LSP symbol'larını recursive olarak arar
+   */
+  private findSymbolByLineAndName(
+    symbols: vscode.DocumentSymbol[],
+    targetLine: number,
+    targetName: string,
+    targetType: string
+  ): vscode.DocumentSymbol | null {
+    for (const symbol of symbols) {
+      // Line ve name match kontrolü
+      const symbolLine = symbol.range.start.line;
+      const symbolName = symbol.name;
+
+      // Constructor özel durumu
+      if (
+        targetType === "constructor" &&
+        symbol.kind === vscode.SymbolKind.Constructor
+      ) {
+        if (Math.abs(symbolLine - targetLine) <= 1) {
+          // 1 satır tolerans
+          return symbol;
+        }
+      }
+      // Diğer tipler için normal kontrolü
+      else if (
+        symbolName === targetName &&
+        Math.abs(symbolLine - targetLine) <= 1
+      ) {
+        return symbol;
+      }
+
+      // Child symbol'larda da ara
+      if (symbol.children && symbol.children.length > 0) {
+        const childResult = this.findSymbolByLineAndName(
+          symbol.children,
+          targetLine,
+          targetName,
+          targetType
+        );
+        if (childResult) {
+          return childResult;
+        }
+      }
     }
 
-    const startPosition = new vscode.Position(startLine, 0);
+    return null;
+  }
 
-    // Blok tipine göre end pozisyonunu hesapla
-    let endLine = startLine;
-    const totalLines = document.lineCount;
-
-    // Blok sonunu bul
-    if (type === "class" || type === "interface" || type === "enum") {
-      // Class/interface/enum için süslü parantezleri say
-      let braceCount = 0;
-      let foundFirstBrace = false;
-
-      for (let i = startLine; i < totalLines; i++) {
-        const lineText = document.lineAt(i).text;
-
-        for (const char of lineText) {
-          if (char === "{") {
-            braceCount++;
-            foundFirstBrace = true;
-          } else if (char === "}") {
-            braceCount--;
-            if (foundFirstBrace && braceCount === 0) {
-              endLine = i;
-              break;
-            }
-          }
-        }
-
-        if (foundFirstBrace && braceCount === 0) break;
-      }
-    } else if (type === "method" || type === "function") {
-      // Metod/fonksiyon için süslü parantezleri say
-      let braceCount = 0;
-      let foundFirstBrace = false;
-
-      for (let i = startLine; i < totalLines; i++) {
-        const lineText = document.lineAt(i).text;
-
-        // Arrow function kontrolü
-        if (lineText.includes("=>")) {
-          // Arrow function için farklı logic
-          if (lineText.trim().endsWith(";")) {
-            endLine = i;
-            break;
-          } else if (lineText.includes("{")) {
-            // Multi-line arrow function
-            braceCount = 1;
-            foundFirstBrace = true;
-            continue;
-          }
-        }
-
-        for (const char of lineText) {
-          if (char === "{") {
-            braceCount++;
-            foundFirstBrace = true;
-          } else if (char === "}") {
-            braceCount--;
-            if (foundFirstBrace && braceCount === 0) {
-              endLine = i;
-              break;
-            }
-          }
-        }
-
-        if (foundFirstBrace && braceCount === 0) break;
-      }
-    } else {
-      // Diğer tipler için sadece o satırı seç
-      endLine = startLine;
-    }
-
-    // Selection oluştur
-    const startPos = new vscode.Position(startLine, 0);
-    const endPos = new vscode.Position(
-      endLine,
-      document.lineAt(endLine).text.length
-    );
+  /**
+   * LSP başarısız olursa fallback selection
+   */
+  private fallbackSelection(line: number, document: vscode.TextDocument): void {
+    const startPos = new vscode.Position(line, 0);
+    const endPos = new vscode.Position(line, document.lineAt(line).text.length);
     const selection = new vscode.Selection(startPos, endPos);
 
-    // Seçimi uygula ve görünüme getir
-    editor.selection = selection;
-    editor.revealRange(selection, vscode.TextEditorRevealType.InCenter);
+    const editor = vscode.window.activeTextEditor;
+    if (editor) {
+      editor.selection = selection;
+      editor.revealRange(selection, vscode.TextEditorRevealType.InCenter);
+    }
   }
 
   /**
